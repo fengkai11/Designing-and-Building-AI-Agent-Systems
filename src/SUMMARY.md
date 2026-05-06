@@ -1,0 +1,55 @@
+# Summary
+
+- [封面](00-cover.md)
+- [版权与使用说明](01-copyright.md)
+- [前言](02-preface.md)
+
+- [第一篇：重新理解 Agent]()
+  - [第 1 章：为什么要系统学习 Agent](chapter-01-why-systematically-learn-agent.md)
+  - [第 2 章：Agent 的能力模型](chapter-02-agent-capability-model.md)
+  - [第 3 章：什么时候该用 Agent，什么时候不该用 Agent](chapter-03-when-to-use-agent.md)
+
+- [第二篇：Agent 核心机制]()
+  - [第 4 章：Agent Loop：从 Observe 到 Act](chapter-04-agent-loop.md)
+  - [第 5 章：工具系统：Agent 的手和脚](chapter-05-tool-system.md)
+  - [第 6 章：上下文工程：Agent 的工作记忆](chapter-06-context-engineering.md)
+  - [第 7 章：Planning：让 Agent 做正确的下一步](chapter-07-planning.md)
+
+- [第三篇：记忆、知识库与长期任务]()
+  - [第 8 章：Memory：Agent 如何越用越懂你](chapter-08-memory.md)
+  - [第 9 章：RAG 与知识库：让 Agent 使用外部知识](chapter-09-rag-knowledge-base.md)
+  - [第 10 章：Long-running Agent：长任务、调度与恢复](chapter-10-long-running-agent.md)
+
+- [第四篇：可控、安全、可评估的 Agent]()
+  - [第 11 章：Human-in-the-loop：人机协同与审批系统](chapter-11-human-in-the-loop.md)
+  - [第 12 章：Evaluation：如何判断 Agent 是否真的有用](chapter-12-evaluation.md)
+  - [第 13 章：Observability：让 Agent 的行为可追踪](chapter-13-observability.md)
+
+- [第五篇：源码研究与架构模式]()
+  - [第 14 章：如何阅读 Agent 项目源码](chapter-14-how-to-read-agent-source-code.md)
+  - [第 15 章：OpenClaw、Hermes 类助理、Claude Code 与 Codex 的学习价值](chapter-15-openclaw-hermes-claude-code.md)
+  - [第 16 章：从源码中提炼自己的 Agent Runtime](chapter-16-design-your-agent-runtime.md)
+
+- [第六篇：综合实战项目]()
+  - [第 17 章：项目一：任务型研究 Agent](chapter-17-research-agent.md)
+  - [第 18 章：项目二：外贸客户开发 Agent](chapter-18-foreign-trade-agent.md)
+  - [第 19 章：项目三：代码开发 Agent Mini 版](chapter-19-code-agent-mini.md)
+  - [第 20 章：从 Demo 到产品：Agent 系统如何持续演进](chapter-20-from-demo-to-product.md)
+
+- [附录]()
+  - [附录 A：Agent 术语表](appendix/appendix-a-agent-glossary.md)
+  - [附录 B：Prompt 模式与模板](appendix/appendix-b-prompt-patterns.md)
+  - [附录 C：Tool Schema 示例](appendix/appendix-c-tool-schema-examples.md)
+  - [附录 D：Agent 评估模板](appendix/appendix-d-agent-evaluation-template.md)
+  - [附录 E：源码阅读模板](appendix/appendix-e-source-code-reading-template.md)
+  - [附录 F：90 天学习路线](appendix/appendix-f-90-day-learning-roadmap.md)
+  - [附录 G：6 个月项目路线](appendix/appendix-g-six-month-project-roadmap.md)
+
+- [辅助文档]()
+  - [插图索引](extras/figure-index.md)
+  - [全书总索引](extras/total-index.md)
+  - [练习汇总](extras/exercise-summary.md)
+  - [练习参考答案与评分指南](extras/exercise-answer-guide.md)
+  - [代码目录说明](extras/code-directory-guide.md)
+  - [配套代码工程任务书](extras/companion-code-tasks.md)
+  - [参考资料与事实边界](extras/references.md)

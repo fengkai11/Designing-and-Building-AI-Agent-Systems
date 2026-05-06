@@ -1,0 +1,41 @@
+[book]
+title = "从零构建 AI Agent 系统"
+authors = ["kai feng"]
+description = "一本面向工程实践的 AI Agent 系统学习教程：理论、架构、源码研究与工程实现。"
+language = "zh-CN"
+multilingual = false
+src = "src"
+
+[build]
+build-dir = "book"
+create-missing = false
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/fengkai11/Designing-and-Building-AI-Agent-Systems"
+git-repository-icon = "fa-github"
+edit-url-template = "https://github.com/fengkai11/Designing-and-Building-AI-Agent-Systems/edit/main/{path}"
+site-url = "/Designing-and-Building-AI-Agent-Systems/"
+mathjax-support = true
+copy-fonts = true
+no-section-label = false
+
+[output.html.print]
+enable = true
+page-break = true
+
+[output.html.fold]
+enable = true
+level = 1
+
+[output.html.search]
+enable = true
+limit-results = 30
+teaser-word-count = 30
+use-boolean-and = true
+boost-title = 2
+boost-hierarchy = 1
+boost-paragraph = 1
+expand = true
+heading-split-level = 3
