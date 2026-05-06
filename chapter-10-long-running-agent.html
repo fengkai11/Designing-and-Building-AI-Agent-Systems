@@ -1,0 +1,1052 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>第 10 章：Long-running Agent：长任务、调度与恢复 - 从零构建 AI Agent 系统</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="一本面向工程实践的 AI Agent 系统学习教程：理论、架构、源码研究与工程实现。">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">从零构建 AI Agent 系统</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/fengkai11/Designing-and-Building-AI-Agent-Systems" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/fengkai11/Designing-and-Building-AI-Agent-Systems/edit/main/src/chapter-10-long-running-agent.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="第-10-章long-running-agent长任务调度与恢复"><a class="header" href="#第-10-章long-running-agent长任务调度与恢复">第 10 章：Long-running Agent：长任务、调度与恢复</a></h1>
+<blockquote>
+<p>长期任务系统并不是孤立模块，下图展示了它与 Runtime、Memory、RAG 的关系，建议先整体理解。</p>
+</blockquote>
+<p><img src="figures/fig-08-10-01-memory-rag-longrunning.png" alt="图 8-10-1 Memory、RAG 与 Long-running Agent 关系图" /></p>
+<p><em>图 8-10-1 Memory、RAG 与 Long-running Agent 关系图</em></p>
+<p>前面几章中，我们已经把 Agent 的核心能力拆开：Agent Loop 负责执行循环，工具系统负责行动能力，上下文工程负责当前工作记忆，Planning 负责步骤安排，Memory 负责长期经验，RAG 负责外部知识。</p>
+<p>这些能力组合起来，已经可以完成不少任务。但如果 Agent 只能在一次对话中运行几步，然后立即返回结果，它仍然很难承担真实工作。</p>
+<p>真实工作往往不是几分钟内完成的。</p>
+<p>外贸获客 Agent 需要每天搜索新客户，持续去重，生成待审批开发信，根据回复安排跟进。教育 Agent 需要按天、按周追踪学生学习情况，定期生成报告，提醒老师干预。代码 Agent 可能需要等待测试完成、等待用户 review、根据 CI 结果继续修复。运营 Agent 可能要长期监控数据变化，一旦异常才通知人。</p>
+<p>这些任务都有一个共同特征：它们跨越时间。</p>
+<p>跨越时间之后，Agent 系统会面对一组新问题：任务执行到哪一步？中间结果保存在哪里？模型调用失败怎么办？工具超时怎么办？用户中途修改目标怎么办？等待人工审批时如何暂停？下次恢复时如何知道之前发生了什么？每天自动运行如何避免重复？如何取消任务？如何追踪成本和失败原因？</p>
+<p>这就是 Long-running Agent 要解决的问题。</p>
+<p>本章的目标，是让你理解长任务 Agent 的系统结构。它不是让模型“多思考一会儿”，而是要引入任务状态、队列、调度器、checkpoint、resume、cancel、retry、通知、审计日志和人工确认节点。</p>
+<hr />
+<h2 id="101-为什么长任务是-agent-产品化的分水岭"><a class="header" href="#101-为什么长任务是-agent-产品化的分水岭">10.1 为什么长任务是 Agent 产品化的分水岭</a></h2>
+<p>很多 Agent Demo 是同步执行的。用户发一个请求，Agent 循环几步，返回结果。</p>
+<p>这种模式适合简单任务，例如：</p>
+<blockquote>
+<p>总结这篇文章。</p>
+</blockquote>
+<blockquote>
+<p>根据这段产品资料写一封开发信。</p>
+</blockquote>
+<blockquote>
+<p>读取这几个文件并解释项目结构。</p>
+</blockquote>
+<p>但是，一旦任务变长，同步模式就会暴露问题。</p>
+<p>假设用户说：</p>
+<blockquote>
+<p>帮我找 50 家墨西哥五金工具分销商，排除零售店，整理邮箱，生成开发信草稿，明天提醒我审核。</p>
+</blockquote>
+<p>这个任务可能需要搜索几十次，读取大量网页，进行去重和评分，还要等待用户第二天审核。它不适合在一次模型调用中完成，也不适合让用户一直开着页面等待。</p>
+<p>再看代码任务：</p>
+<blockquote>
+<p>帮我重构认证模块，保持现有测试通过。</p>
+</blockquote>
+<p>Agent 可能需要多次读取文件、修改代码、运行测试。测试可能耗时几分钟，用户可能中途离开。任务必须能暂停、恢复和回放。</p>
+<p>长任务是 Agent 产品化的分水岭，因为它要求系统具备持续性。</p>
+<p>短任务可以靠上下文维持状态；长任务必须靠持久化状态。</p>
+<p>短任务失败可以让用户重试；长任务失败必须能从 checkpoint 恢复。</p>
+<p>短任务可以不记录完整轨迹；长任务必须可审计，否则用户不知道 Agent 做了什么。</p>
+<p>短任务可以只在对话窗口里交互；长任务需要任务列表、进度、通知、审批队列和历史记录。</p>
+<p>所以，一个能跑 Demo 的 Agent 和一个能长期工作的 Agent，架构上差距很大。</p>
+<hr />
+<h2 id="102-长任务的基本单元task"><a class="header" href="#102-长任务的基本单元task">10.2 长任务的基本单元：Task</a></h2>
+<p>Long-running Agent 的第一步，是把用户请求变成可管理的 Task。</p>
+<p>一个 Task 不只是用户一句话，而是一组结构化状态。</p>
+<p>例如：</p>
+<pre><code class="language-json">{
+  "task_id": "task_001",
+  "title": "开发阿联酋钢卷尺客户",
+  "goal": "寻找 30 家阿联酋五金工具分销商，生成客户评分和开发信草稿。",
+  "status": "running",
+  "created_at": "2026-05-06T09:00:00Z",
+  "updated_at": "2026-05-06T09:10:00Z",
+  "owner_id": "user_001",
+  "current_step": "lead_scoring",
+  "progress": {
+    "searched_queries": 12,
+    "candidate_leads": 54,
+    "qualified_leads": 18,
+    "drafts_created": 0
+  },
+  "constraints": {
+    "target_country": "UAE",
+    "exclude_retail": true,
+    "max_leads": 30
+  }
+}
+</code></pre>
+<p>Task 至少应该包含：</p>
+<p>任务 ID；</p>
+<p>任务目标；</p>
+<p>当前状态；</p>
+<p>创建时间和更新时间；</p>
+<p>所属用户或项目；</p>
+<p>当前步骤；</p>
+<p>进度信息；</p>
+<p>约束条件；</p>
+<p>中间结果；</p>
+<p>错误信息；</p>
+<p>审批状态；</p>
+<p>执行轨迹引用。</p>
+<p>很多初学者会把长任务状态放在对话历史里，这是不够的。对话历史是给模型看的，Task State 是给系统管理的。系统必须能在不调用模型的情况下知道任务状态。</p>
+<p>例如，任务是否正在等待用户审批，不应该靠模型读聊天记录猜，而应该有明确字段：</p>
+<pre><code class="language-json">{
+  "status": "waiting_for_approval",
+  "waiting_on": "email_drafts_review",
+  "approval_ids": ["apv_001", "apv_002"]
+}
+</code></pre>
+<p>这就是工程化和 Demo 的区别。</p>
+<hr />
+<h2 id="103-任务状态机"><a class="header" href="#103-任务状态机">10.3 任务状态机</a></h2>
+<p>长任务需要状态机。</p>
+<p>状态机定义任务可能处于哪些状态，以及状态之间如何转换。没有状态机，系统就会变得模糊：任务到底是在运行、失败、暂停、等待审批，还是已经完成？</p>
+<p>一个基础状态机可以包括：</p>
+<pre><code class="language-text">created
+  ↓
+queued
+  ↓
+running
+  ↓     ↘
+waiting_for_approval  failed
+  ↓             ↓
+running       retrying
+  ↓             ↓
+completed     running
+
+其他状态：paused、cancelled、expired
+</code></pre>
+<p>每个状态有明确含义。</p>
+<p>created：任务已创建，但尚未进入队列。</p>
+<p>queued：任务等待执行。</p>
+<p>running：任务正在执行。</p>
+<p>waiting_for_approval：任务暂停，等待人工确认。</p>
+<p>paused：用户主动暂停。</p>
+<p>failed：任务失败，需要处理。</p>
+<p>retrying：系统正在重试。</p>
+<p>completed：任务完成。</p>
+<p>cancelled：任务被取消。</p>
+<p>expired：任务超时或长期无人处理。</p>
+<p>状态转换要有规则。例如，只有 running 状态可以进入 waiting_for_approval；completed 任务不能重新进入 running，除非创建新任务或执行 follow-up；cancelled 任务不能继续调用工具。</p>
+<p>状态机的价值是可控。</p>
+<p>以外贸 Agent 为例，生成开发信草稿后，任务进入 waiting_for_approval。此时 Agent 不应继续发送邮件，也不应假设用户已经同意。只有审批通过后，任务才能继续。</p>
+<p>以代码 Agent 为例，生成修改计划后，任务进入 waiting_for_approval。用户确认前，Agent 不应写文件。确认后进入 running，开始修改。</p>
+<p>这说明状态机不仅管理进度，也管理权限。</p>
+<hr />
+<h2 id="104-job-queue把任务放进队列"><a class="header" href="#104-job-queue把任务放进队列">10.4 Job Queue：把任务放进队列</a></h2>
+<p>长任务不能总是同步执行。需要 Job Queue。</p>
+<p>Task 是业务层概念，表示用户目标；Job 是执行层概念，表示某个可运行工作单元。</p>
+<p>一个 Task 可能拆成多个 Job。例如外贸客户开发 Task 可以拆成：</p>
+<ul>
+<li>搜索客户 Job；</li>
+<li>读取网页 Job；</li>
+<li>客户去重 Job；</li>
+<li>商机评分 Job；</li>
+<li>生成开发信 Job；</li>
+<li>等待审批 Job；</li>
+<li>跟进提醒 Job。</li>
+</ul>
+<p>Job Queue 的作用是：</p>
+<p>异步执行任务；</p>
+<p>控制并发；</p>
+<p>失败重试；</p>
+<p>限制速率；</p>
+<p>支持延迟执行；</p>
+<p>记录执行结果。</p>
+<p>例如搜索客户时，不能无限并发访问网站。队列可以限制每分钟请求数，避免被封或造成不必要压力。</p>
+<p>一个 Job 可以表示为：</p>
+<pre><code class="language-json">{
+  "job_id": "job_001",
+  "task_id": "task_001",
+  "job_type": "search_leads",
+  "status": "queued",
+  "priority": 5,
+  "run_at": "2026-05-06T09:00:00Z",
+  "attempts": 0,
+  "max_attempts": 3,
+  "payload": {
+    "query": "UAE hardware distributor measuring tools"
+  }
+}
+</code></pre>
+<p>当 Worker 取出 Job 后，执行对应逻辑。成功后写入结果，失败后根据策略重试或标记失败。</p>
+<p>这里要注意，长任务 Agent 不应该让模型一次性控制所有执行。更合理的方式是：系统把任务拆成可管理 Job，模型在需要判断和生成的节点参与。</p>
+<p>例如，“客户去重”可能主要是规则和数据库逻辑；“判断客户类型”可以调用模型；“生成开发信”可以调用模型；“等待审批”由系统控制。</p>
+<p>这也是工作流与 Agent 组合的体现。</p>
+<hr />
+<h2 id="105-scheduler定时与周期任务"><a class="header" href="#105-scheduler定时与周期任务">10.5 Scheduler：定时与周期任务</a></h2>
+<p>长任务不仅可能耗时，还可能周期性发生。</p>
+<p>用户可能说：</p>
+<blockquote>
+<p>每天上午 9 点帮我搜索 20 个新的目标客户。</p>
+</blockquote>
+<p>或者：</p>
+<blockquote>
+<p>每周五生成学生学习报告。</p>
+</blockquote>
+<p>或者：</p>
+<blockquote>
+<p>每隔 3 天检查没有回复的客户，并生成跟进建议。</p>
+</blockquote>
+<p>这需要 Scheduler。</p>
+<p>Scheduler 负责根据时间创建 Job 或 Task。它可以支持一次性定时、周期性任务、延迟任务和条件触发任务。</p>
+<p>外贸 Agent 中常见调度包括：</p>
+<p>每日线索搜索；</p>
+<p>邮件发送后 3 天未回复提醒；</p>
+<p>客户回复后生成下一步建议；</p>
+<p>每周汇总客户开发进展；</p>
+<p>每月复盘高质量线索来源。</p>
+<p>教育 Agent 中常见调度包括：</p>
+<p>每日练习任务；</p>
+<p>错题间隔复习；</p>
+<p>每周学习报告；</p>
+<p>考试前专项复习计划；</p>
+<p>长期薄弱点提醒。</p>
+<p>代码 Agent 中调度少一些，但也可能有：</p>
+<p>定期检查 CI 失败；</p>
+<p>等待用户 review 超时提醒；</p>
+<p>依赖更新扫描。</p>
+<p>Scheduler 的关键不是简单定时，而是和任务状态结合。例如邮件发送后 3 天跟进，前提是客户没有回复。如果客户已经回复，就不应该继续按原计划跟进。</p>
+<p>所以调度任务执行前要检查条件。</p>
+<p>伪代码：</p>
+<pre><code class="language-python">def run_follow_up_job(lead_id: str):
+    lead = lead_repository.get(lead_id)
+
+    if lead.reply_status == "replied":
+        return "skip: lead already replied"
+
+    if lead.status != "contacted":
+        return "skip: lead not contacted"
+
+    create_task(
+        title=f"为 {lead.company_name} 生成跟进建议",
+        goal="根据历史开发信和客户状态生成 follow-up email draft",
+    )
+</code></pre>
+<p>这就是条件调度。</p>
+<hr />
+<h2 id="106-checkpoint失败后能恢复"><a class="header" href="#106-checkpoint失败后能恢复">10.6 Checkpoint：失败后能恢复</a></h2>
+<p>长任务一定会失败。</p>
+<p>模型可能输出格式错误，工具可能超时，网页可能打不开，API 可能限流，数据库可能连接失败，用户可能中途修改目标，测试可能失败。系统必须假设失败会发生。</p>
+<p>Checkpoint 的作用是保存任务关键阶段的状态，使任务可以从某个安全点恢复，而不是从头开始。</p>
+<p>例如外贸客户搜索任务：</p>
+<p>第一阶段，生成搜索关键词；</p>
+<p>第二阶段，搜索候选客户；</p>
+<p>第三阶段，读取客户网站；</p>
+<p>第四阶段，客户去重；</p>
+<p>第五阶段，评分；</p>
+<p>第六阶段，生成开发信。</p>
+<p>每完成一个阶段，都可以保存 checkpoint。</p>
+<pre><code class="language-json">{
+  "checkpoint_id": "ckpt_003",
+  "task_id": "task_001",
+  "step": "lead_dedup_completed",
+  "created_at": "2026-05-06T09:30:00Z",
+  "state_snapshot": {
+    "candidate_leads": 54,
+    "deduped_leads": 31,
+    "excluded_leads": 23
+  }
+}
+</code></pre>
+<p>如果评分阶段失败，系统可以从去重后的客户列表继续，而不必重新搜索。</p>
+<p>代码 Agent 中，checkpoint 更重要。修改文件前应记录 git diff 或创建临时分支。这样如果修改失败，可以 rollback。</p>
+<p>例如：</p>
+<pre><code class="language-text">Checkpoint A：读取项目后，尚未修改。
+Checkpoint B：生成修改计划，等待确认。
+Checkpoint C：修改 auth.py 后。
+Checkpoint D：测试通过后。
+</code></pre>
+<p>如果测试失败且修复越来越乱，用户可以回滚到 Checkpoint B。</p>
+<p>Checkpoint 不只是技术细节，它是用户信任的一部分。用户敢让 Agent 做更多事，是因为知道可以恢复。</p>
+<hr />
+<h2 id="107-resume恢复执行不是简单重跑"><a class="header" href="#107-resume恢复执行不是简单重跑">10.7 Resume：恢复执行不是简单重跑</a></h2>
+<p>有了 checkpoint，还要能 resume。</p>
+<p>Resume 不是把原任务从头再跑一遍，而是根据当前状态继续执行。</p>
+<p>假设外贸 Agent 已经完成客户搜索和去重，但在生成开发信时失败。恢复时，系统应该知道：</p>
+<ul>
+<li>搜索不需要重做；</li>
+<li>去重结果可复用；</li>
+<li>评分结果是否已完成；</li>
+<li>哪些客户已生成草稿；</li>
+<li>哪个客户失败；</li>
+<li>失败原因是什么。</li>
+</ul>
+<p>因此，任务状态要足够结构化。</p>
+<p>如果中间结果只是模型输出的一段文本，恢复会很困难。系统无法可靠知道哪些客户处理过。更好的方式是每个客户都有状态字段：</p>
+<pre><code class="language-json">{
+  "lead_id": "lead_001",
+  "profile_status": "completed",
+  "score_status": "completed",
+  "email_draft_status": "failed",
+  "last_error": "missing product knowledge: MOQ"
+}
+</code></pre>
+<p>恢复时只处理 <code>email_draft_status=failed</code> 或 <code>pending</code> 的客户。</p>
+<p>代码 Agent 也一样。恢复时要检查当前文件状态、上次 diff、测试结果和用户确认状态，而不是盲目继续。</p>
+<p>Resume 的关键是幂等性。一个步骤重复执行不应该造成重复副作用。</p>
+<p>例如，生成邮件草稿可以重复，但发送邮件不能重复。发送邮件前必须检查是否已经发送过。</p>
+<pre><code class="language-python">def send_email_once(lead_id: str, draft_id: str):
+    outreach = outreach_repo.find_by_draft_id(draft_id)
+    if outreach and outreach.status == "sent":
+        return "skip: already sent"
+
+    send_email(draft_id)
+    outreach_repo.mark_sent(draft_id)
+</code></pre>
+<p>这就是幂等设计。</p>
+<hr />
+<h2 id="108-retry不是所有失败都应该重试"><a class="header" href="#108-retry不是所有失败都应该重试">10.8 Retry：不是所有失败都应该重试</a></h2>
+<p>失败后是否重试，要看失败类型。</p>
+<p>有些失败适合自动重试。例如网络超时、临时 API 限流、网页加载失败、模型服务短暂不可用。</p>
+<p>有些失败不应该重试。例如参数错误、权限不足、用户输入缺失、工具 schema 不匹配、知识库没有必要资料。</p>
+<p>有些失败需要换策略。例如搜索结果质量差，不是简单重试同一个 query，而是改关键词。</p>
+<p>因此，Retry 策略不能只是“失败就再跑三次”。</p>
+<p>可以把失败分成：</p>
+<p>transient：临时错误，可重试；</p>
+<p>permanent：永久错误，不重试；</p>
+<p>strategy_error：策略错误，需要重新规划；</p>
+<p>human_required：需要人工补充信息或确认。</p>
+<p>例如：</p>
+<pre><code class="language-json">{
+  "error_type": "human_required",
+  "message": "知识库缺少该产品的 MOQ 信息，无法生成可靠开发信。",
+  "suggested_action": "请补充 MOQ 或允许邮件中不写 MOQ。"
+}
+</code></pre>
+<p>这种错误不应该自动重试。重试 10 次也没有用。</p>
+<p>再比如：</p>
+<pre><code class="language-json">{
+  "error_type": "strategy_error",
+  "message": "连续 5 个搜索结果均为零售店，当前关键词质量较低。",
+  "suggested_action": "改用 wholesale、distributor、building materials supplier 等关键词。"
+}
+</code></pre>
+<p>这时应该触发 replanning。</p>
+<p>Retry 还要考虑成本。模型调用和搜索 API 都可能付费。长任务中必须设置最大重试次数、最大成本、最大执行时间。</p>
+<hr />
+<h2 id="109-cancellation用户必须能中断-agent"><a class="header" href="#109-cancellation用户必须能中断-agent">10.9 Cancellation：用户必须能中断 Agent</a></h2>
+<p>长任务 Agent 必须支持取消。</p>
+<p>用户可能发现任务目标错了，想停止；也可能看到 Agent 正在朝错误方向执行，想中断；也可能任务已经没有价值。</p>
+<p>如果系统不支持取消，用户会失去控制感。</p>
+<p>取消不是简单设置一个标志。系统还要处理正在运行的 Job、未完成工具调用、已生成但未审批的结果、已安排的未来调度。</p>
+<p>一个取消流程可以是：</p>
+<p>用户点击取消；</p>
+<p>Task 状态变为 cancelling；</p>
+<p>Worker 在安全点检查取消标志；</p>
+<p>停止后续模型调用和工具调用；</p>
+<p>保留已完成结果；</p>
+<p>取消未执行 Job；</p>
+<p>保留审计日志；</p>
+<p>状态变为 cancelled。</p>
+<p>对于有副作用的工具，取消要特别小心。如果邮件已经发送，无法撤回。系统只能记录状态，而不能假装取消成功。因此，高风险动作之前应有审批和最终确认。</p>
+<p>代码 Agent 中，如果正在修改文件，取消时可能需要询问用户是否保留当前 diff，或回滚到上一个 checkpoint。</p>
+<p>取消能力体现了一个基本原则：</p>
+<blockquote>
+<p>Agent 是为用户工作，不是替用户接管系统。</p>
+</blockquote>
+<hr />
+<h2 id="1010-human-in-the-loop-与长任务暂停"><a class="header" href="#1010-human-in-the-loop-与长任务暂停">10.10 Human-in-the-loop 与长任务暂停</a></h2>
+<p>第 11 章会专门讨论 Human-in-the-loop，这里先讲它和长任务的关系。</p>
+<p>长任务中，人工确认不是异常，而是正常状态。</p>
+<p>外贸 Agent 生成开发信后，应暂停等待审批。</p>
+<p>代码 Agent 生成修改计划后，应暂停等待确认。</p>
+<p>教育 Agent 生成学生干预建议后，可能需要老师确认。</p>
+<p>企业流程 Agent 遇到合同、付款、删除数据等高风险动作时，必须等待人工审批。</p>
+<p>这意味着任务状态机必须支持 waiting_for_approval。</p>
+<p>审批对象也要结构化。例如：</p>
+<pre><code class="language-json">{
+  "approval_id": "apv_001",
+  "task_id": "task_001",
+  "approval_type": "email_draft",
+  "status": "pending",
+  "risk_level": "medium",
+  "title": "发送给 ABC Building Materials 的开发信草稿",
+  "content": "...",
+  "options": ["approve", "edit", "reject"],
+  "created_at": "2026-05-06T10:00:00Z"
+}
+</code></pre>
+<p>用户可以批准、修改、拒绝。不同选择触发不同状态转换。</p>
+<p>批准后，任务继续。</p>
+<p>修改后，系统使用修改版本继续。</p>
+<p>拒绝后，该分支结束或重新生成。</p>
+<p>等待审批期间，任务不能丢失上下文。系统不能依赖聊天窗口还开着，而要把审批对象、中间状态和下一步动作保存下来。</p>
+<hr />
+<h2 id="1011-通知系统"><a class="header" href="#1011-通知系统">10.11 通知系统</a></h2>
+<p>长任务需要通知。</p>
+<p>如果 Agent 完成任务、失败、等待审批、需要补充信息，用户应该知道。</p>
+<p>通知可以有多种形式：</p>
+<p>站内消息；</p>
+<p>邮件；</p>
+<p>聊天消息；</p>
+<p>移动端推送；</p>
+<p>任务列表红点；</p>
+<p>日常摘要。</p>
+<p>通知不是越多越好。太多通知会打扰用户。需要按重要性分级。</p>
+<p>例如：</p>
+<p>低优先级：每日搜索完成，生成 20 条候选线索。可以进入日报。</p>
+<p>中优先级：有 5 封开发信等待审批。可以站内提醒。</p>
+<p>高优先级：客户回复询价。应该即时通知。</p>
+<p>紧急：Agent 执行高风险操作前需要确认。必须明确提醒。</p>
+<p>通知内容也要可操作。不要只写：</p>
+<blockquote>
+<p>任务需要处理。</p>
+</blockquote>
+<p>更好的通知是：</p>
+<blockquote>
+<p>阿联酋客户开发任务已生成 12 封开发信草稿，其中 4 家评分超过 80。请审核后决定是否发送。</p>
+</blockquote>
+<p>通知应该直接链接到审批队列或任务详情。</p>
+<hr />
+<h2 id="1012-audit-log长任务必须可回放"><a class="header" href="#1012-audit-log长任务必须可回放">10.12 Audit Log：长任务必须可回放</a></h2>
+<p>长任务如果没有审计日志，失败后很难排查。</p>
+<p>Audit Log 记录任务执行过程中发生了什么：</p>
+<p>任务创建；</p>
+<p>状态变化；</p>
+<p>模型调用；</p>
+<p>工具调用；</p>
+<p>工具结果；</p>
+<p>错误；</p>
+<p>重试；</p>
+<p>审批；</p>
+<p>用户修改；</p>
+<p>通知；</p>
+<p>任务完成。</p>
+<p>例如：</p>
+<pre><code class="language-json">{
+  "event_id": "evt_001",
+  "task_id": "task_001",
+  "timestamp": "2026-05-06T09:15:00Z",
+  "event_type": "tool_call",
+  "actor": "agent",
+  "data": {
+    "tool_name": "search_web",
+    "arguments": {
+      "query": "UAE hardware distributor measuring tools"
+    },
+    "result_count": 10,
+    "duration_ms": 1200
+  }
+}
+</code></pre>
+<p>审计日志的价值包括：</p>
+<p>让用户知道 Agent 做了什么；</p>
+<p>帮助开发者定位失败原因；</p>
+<p>支持评估和优化；</p>
+<p>满足合规和责任追踪；</p>
+<p>为未来记忆和经验总结提供素材。</p>
+<p>审计日志和普通日志不同。普通日志面向开发者，审计日志面向任务和用户。它应该可读、可追溯、可关联。</p>
+<p>第 13 章会专门讨论 Observability，这里先把它作为长任务基础设施的一部分。</p>
+<hr />
+<h2 id="1013-最小长任务系统实现"><a class="header" href="#1013-最小长任务系统实现">10.13 最小长任务系统实现</a></h2>
+<p>下面用 Python 伪代码实现一个最小长任务框架。它不依赖复杂队列，只用内存结构帮助理解。</p>
+<p>先定义 Task 和 Job。</p>
+<pre><code class="language-python">from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Any, Literal
+import uuid
+
+TaskStatus = Literal[
+    "created", "queued", "running", "waiting_for_approval",
+    "paused", "failed", "completed", "cancelled"
+]
+
+JobStatus = Literal["queued", "running", "failed", "completed", "cancelled"]
+
+@dataclass
+class Task:
+    title: str
+    goal: str
+    owner_id: str
+    status: TaskStatus = "created"
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    current_step: str | None = None
+    created_at: datetime = field(default_factory=datetime.utcnow)
+    updated_at: datetime = field(default_factory=datetime.utcnow)
+    state: dict[str, Any] = field(default_factory=dict)
+
+@dataclass
+class Job:
+    task_id: str
+    job_type: str
+    payload: dict[str, Any]
+    status: JobStatus = "queued"
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    attempts: int = 0
+    max_attempts: int = 3
+    run_at: datetime = field(default_factory=datetime.utcnow)
+    last_error: str | None = None
+</code></pre>
+<p>实现简单仓库。</p>
+<pre><code class="language-python">class TaskRepository:
+    def __init__(self):
+        self.tasks: dict[str, Task] = {}
+
+    def save(self, task: Task):
+        task.updated_at = datetime.utcnow()
+        self.tasks[task.id] = task
+
+    def get(self, task_id: str) -&gt; Task:
+        return self.tasks[task_id]
+
+class JobQueue:
+    def __init__(self):
+        self.jobs: list[Job] = []
+
+    def enqueue(self, job: Job):
+        self.jobs.append(job)
+
+    def next_job(self) -&gt; Job | None:
+        now = datetime.utcnow()
+        for job in self.jobs:
+            if job.status == "queued" and job.run_at &lt;= now:
+                return job
+        return None
+</code></pre>
+<p>实现 Worker。</p>
+<pre><code class="language-python">class Worker:
+    def __init__(self, task_repo: TaskRepository, job_queue: JobQueue):
+        self.task_repo = task_repo
+        self.job_queue = job_queue
+
+    def run_once(self):
+        job = self.job_queue.next_job()
+        if not job:
+            return
+
+        task = self.task_repo.get(job.task_id)
+
+        if task.status == "cancelled":
+            job.status = "cancelled"
+            return
+
+        job.status = "running"
+        job.attempts += 1
+        task.status = "running"
+        task.current_step = job.job_type
+        self.task_repo.save(task)
+
+        try:
+            self.handle_job(task, job)
+            job.status = "completed"
+        except Exception as exc:
+            job.last_error = str(exc)
+            if job.attempts &lt; job.max_attempts:
+                job.status = "queued"
+            else:
+                job.status = "failed"
+                task.status = "failed"
+                task.state["last_error"] = str(exc)
+                self.task_repo.save(task)
+
+    def handle_job(self, task: Task, job: Job):
+        if job.job_type == "search_leads":
+            self.search_leads(task, job.payload)
+        elif job.job_type == "score_leads":
+            self.score_leads(task)
+        elif job.job_type == "create_email_drafts":
+            self.create_email_drafts(task)
+        else:
+            raise ValueError(f"unknown job type: {job.job_type}")
+
+    def search_leads(self, task: Task, payload: dict[str, Any]):
+        # 真实系统中这里会调用搜索工具和网页读取工具
+        task.state["candidate_leads"] = [
+            {"name": "ABC Building Materials", "country": "UAE"},
+            {"name": "XYZ Hardware Trading", "country": "UAE"},
+        ]
+        self.task_repo.save(task)
+
+        self.job_queue.enqueue(Job(
+            task_id=task.id,
+            job_type="score_leads",
+            payload={},
+        ))
+
+    def score_leads(self, task: Task):
+        leads = task.state.get("candidate_leads", [])
+        for lead in leads:
+            lead["score"] = 80
+        task.state["scored_leads"] = leads
+        self.task_repo.save(task)
+
+        self.job_queue.enqueue(Job(
+            task_id=task.id,
+            job_type="create_email_drafts",
+            payload={},
+        ))
+
+    def create_email_drafts(self, task: Task):
+        leads = task.state.get("scored_leads", [])
+        drafts = []
+        for lead in leads:
+            drafts.append({
+                "lead": lead["name"],
+                "draft": f"Email draft for {lead['name']}"
+            })
+
+        task.state["email_drafts"] = drafts
+        task.status = "waiting_for_approval"
+        task.current_step = "email_drafts_review"
+        self.task_repo.save(task)
+</code></pre>
+<p>创建任务并运行。</p>
+<pre><code class="language-python">task_repo = TaskRepository()
+job_queue = JobQueue()
+worker = Worker(task_repo, job_queue)
+
+task = Task(
+    title="开发阿联酋钢卷尺客户",
+    goal="寻找阿联酋五金分销商，评分并生成开发信草稿。",
+    owner_id="user_001",
+    status="queued",
+)
+task_repo.save(task)
+
+job_queue.enqueue(Job(
+    task_id=task.id,
+    job_type="search_leads",
+    payload={"query": "UAE hardware distributor measuring tools"},
+))
+
+while True:
+    worker.run_once()
+    current = task_repo.get(task.id)
+    if current.status in ["waiting_for_approval", "failed", "completed", "cancelled"]:
+        break
+
+print(current.status)
+print(current.state)
+</code></pre>
+<p>这个实现非常简化，但它包含长任务系统的基本思想：Task、Job、Queue、Worker、状态转换、阶段推进、等待审批。</p>
+<hr />
+<h2 id="1014-外贸获客-agent-的长任务流程"><a class="header" href="#1014-外贸获客-agent-的长任务流程">10.14 外贸获客 Agent 的长任务流程</a></h2>
+<p>现在把这些机制放到外贸获客 Agent 中，设计一个真实流程。</p>
+<p>用户创建任务：</p>
+<blockquote>
+<p>每天帮我搜索 20 个阿联酋五金工具分销商，排除零售店，生成高优先级客户列表和开发信草稿，等待我审批。</p>
+</blockquote>
+<p>系统创建一个 recurring task template：</p>
+<pre><code class="language-json">{
+  "template_id": "tpl_001",
+  "schedule": "daily 09:00",
+  "goal": "搜索阿联酋五金工具分销商",
+  "constraints": {
+    "country": "UAE",
+    "exclude_retail": true,
+    "max_new_leads_per_day": 20,
+    "require_approval_before_email": true
+  }
+}
+</code></pre>
+<p>每天 9 点 Scheduler 创建 Task。</p>
+<p>Task 执行阶段：</p>
+<ol>
+<li>读取历史客户，避免重复；</li>
+<li>根据经验记忆生成搜索关键词；</li>
+<li>搜索网页；</li>
+<li>提取候选公司；</li>
+<li>去重；</li>
+<li>判断客户类型；</li>
+<li>评分；</li>
+<li>生成客户画像；</li>
+<li>生成开发信草稿；</li>
+<li>创建审批项；</li>
+<li>通知用户。</li>
+</ol>
+<p>任务状态可能是：</p>
+<pre><code class="language-text">queued → running → waiting_for_approval
+</code></pre>
+<p>用户审批后：</p>
+<ul>
+<li>如果批准，邮件进入发送队列；</li>
+<li>如果修改，保存修改版本；</li>
+<li>如果拒绝，记录原因，用于改进；</li>
+<li>发送后创建 3 天后跟进 Job；</li>
+<li>如果客户回复，取消原 follow-up，生成回复分析任务。</li>
+</ul>
+<p>这个流程里，Agent 不是无限自主运行。它在搜索、判断、生成等环节使用智能能力；在发送邮件前必须等待人；在长期调度中由系统控制。</p>
+<p>这就是长任务 Agent 的正确形态：自主执行 + 状态管理 + 人工审批 + 持续调度。</p>
+<hr />
+<h2 id="1015-教育-agent-的长任务流程"><a class="header" href="#1015-教育-agent-的长任务流程">10.15 教育 Agent 的长任务流程</a></h2>
+<p>教育 Agent 的长任务更像学习监督系统。</p>
+<p>老师为学生创建学习计划：</p>
+<blockquote>
+<p>接下来两周，每天安排 20 分钟一次函数应用题训练，根据错题调整练习，周五给我报告。</p>
+</blockquote>
+<p>系统创建计划后，每天生成练习任务。</p>
+<p>学生完成后，Agent 批改并分析错因。错因进入学生画像，但高影响结论可以等待老师确认。</p>
+<p>如果连续多次出现同类错误，系统创建提醒：</p>
+<blockquote>
+<p>该学生连续 4 次在“实际问题中变量关系建立”上出错，建议老师进行一次针对性讲解。</p>
+</blockquote>
+<p>周五 Scheduler 触发报告任务。Agent 从一周数据中生成报告：</p>
+<ul>
+<li>完成情况；</li>
+<li>正确率变化；</li>
+<li>高频错因；</li>
+<li>已改善知识点；</li>
+<li>下周建议；</li>
+<li>需要老师干预的问题。</li>
+</ul>
+<p>老师确认后，系统调整下一周计划。</p>
+<p>这里的长任务机制包括：每日调度、错题状态、学生画像更新、老师审批、周报生成、计划调整。Agent 的价值不是单题讲解，而是持续监督闭环。</p>
+<hr />
+<h2 id="1016-代码-agent-的长任务流程"><a class="header" href="#1016-代码-agent-的长任务流程">10.16 代码 Agent 的长任务流程</a></h2>
+<p>代码 Agent 的长任务通常围绕 repo 修改。</p>
+<p>用户说：</p>
+<blockquote>
+<p>帮我给项目增加邮箱验证码登录，先给计划，我确认后再改。</p>
+</blockquote>
+<p>系统创建 Task。</p>
+<p>第一阶段，Agent 读取项目结构、README、路由、用户模型、测试文件。生成修改计划。Task 进入 waiting_for_approval。</p>
+<p>用户批准后，系统创建 checkpoint，然后 Agent 修改代码。</p>
+<p>修改后运行测试。如果测试失败，Agent 读取错误日志，尝试修复。每次修复都记录 diff 和测试结果。如果连续失败超过阈值，任务进入 failed 或 waiting_for_human。</p>
+<p>测试通过后，生成最终 diff 和说明，等待用户 review。</p>
+<p>用户可以选择接受、要求调整或回滚。</p>
+<p>代码 Agent 的长任务特别强调：</p>
+<p>修改前 checkpoint；</p>
+<p>高风险 shell 命令审批；</p>
+<p>测试失败重试上限；</p>
+<p>diff 可见；</p>
+<p>可 rollback；</p>
+<p>完整 trace。</p>
+<p>这也是为什么代码 Agent 不是简单“让模型写代码”，而是一个围绕 repo、工具、状态、测试和确认构建的系统。</p>
+<hr />
+<h2 id="1017-长任务的成本控制"><a class="header" href="#1017-长任务的成本控制">10.17 长任务的成本控制</a></h2>
+<p>长任务容易失控。它可能调用很多次模型、搜索很多网页、运行很多工具。如果没有成本控制，系统可能变得昂贵且不可预测。</p>
+<p>成本控制包括：</p>
+<p>最大模型调用次数；</p>
+<p>最大 token 消耗；</p>
+<p>最大工具调用次数；</p>
+<p>最大执行时长；</p>
+<p>最大搜索页数；</p>
+<p>最大重试次数；</p>
+<p>最大并发；</p>
+<p>每个任务预算。</p>
+<p>例如外贸搜索任务可以设置：</p>
+<pre><code class="language-json">{
+  "max_search_queries": 20,
+  "max_pages_per_query": 10,
+  "max_model_calls": 100,
+  "max_runtime_minutes": 60,
+  "max_new_leads": 30
+}
+</code></pre>
+<p>当接近预算时，Agent 应该总结当前结果，而不是继续无限探索。</p>
+<p>例如：</p>
+<blockquote>
+<p>本次任务已达到搜索预算上限。已找到 18 个合格客户，其中 7 个高优先级。是否继续扩大搜索？</p>
+</blockquote>
+<p>这比悄悄烧成本更好。</p>
+<hr />
+<h2 id="1018-长任务产品界面"><a class="header" href="#1018-长任务产品界面">10.18 长任务产品界面</a></h2>
+<p>Long-running Agent 需要产品界面支持。一个简单聊天框不足以承载长任务。</p>
+<p>至少需要以下界面：</p>
+<p>任务列表：显示所有任务状态、进度、创建时间、下一步。</p>
+<p>任务详情：显示目标、约束、中间结果、执行轨迹。</p>
+<p>审批队列：集中处理待确认事项。</p>
+<p>通知中心：显示完成、失败、需要处理的提醒。</p>
+<p>调度设置：管理周期任务。</p>
+<p>历史记录：查看已完成任务和结果。</p>
+<p>错误与恢复：显示失败原因，允许重试、修改参数或取消。</p>
+<p>例如外贸 Agent 的任务卡片可以显示：</p>
+<pre><code class="language-text">阿联酋客户开发任务
+状态：等待审批
+进度：已找到 24 个候选客户，12 个合格，8 封开发信待审核
+下一步：审核开发信草稿
+</code></pre>
+<p>用户点击后进入审批列表，而不是在聊天记录里翻找。</p>
+<p>产品界面决定 Agent 是否可用。没有界面，长任务系统即使后端强，也会让用户不知所措。</p>
+<hr />
+<h2 id="1019-常见失败模式"><a class="header" href="#1019-常见失败模式">10.19 常见失败模式</a></h2>
+<p>长任务 Agent 常见失败模式包括：</p>
+<p>第一，没有持久化状态。任务中断后无法恢复。</p>
+<p>第二，状态过于文本化。系统无法可靠判断执行到哪一步。</p>
+<p>第三，没有审批暂停。Agent 在高风险动作上继续自动执行。</p>
+<p>第四，没有幂等设计。恢复或重试导致重复发送、重复写入、重复扣费。</p>
+<p>第五，没有取消能力。用户无法中断错误任务。</p>
+<p>第六，没有重试分类。所有失败都机械重试，浪费成本。</p>
+<p>第七，没有 checkpoint。失败后只能从头开始。</p>
+<p>第八，没有通知。任务完成或失败用户不知道。</p>
+<p>第九，没有审计日志。出了问题无法回放。</p>
+<p>第十，没有预算控制。长任务无限调用模型和工具。</p>
+<p>这些问题说明，Long-running Agent 的难点不在于让模型“多执行几步”，而在于把执行过程工程化、状态化、可恢复化。</p>
+<hr />
+<h2 id="练习题"><a class="header" href="#练习题">练习题</a></h2>
+<h3 id="练习-1设计任务状态机"><a class="header" href="#练习-1设计任务状态机">练习 1：设计任务状态机</a></h3>
+<p>为一个外贸客户开发 Agent 设计任务状态机。至少包含：</p>
+<ul>
+<li>created；</li>
+<li>queued；</li>
+<li>running；</li>
+<li>waiting_for_approval；</li>
+<li>failed；</li>
+<li>completed；</li>
+<li>cancelled。</li>
+</ul>
+<p>请说明每个状态的含义，以及哪些状态可以相互转换。</p>
+<h3 id="练习-2拆分-task-和-job"><a class="header" href="#练习-2拆分-task-和-job">练习 2：拆分 Task 和 Job</a></h3>
+<p>用户任务是：</p>
+<blockquote>
+<p>每天帮我找 20 个沙特钢卷尺潜在客户，生成开发信草稿。</p>
+</blockquote>
+<p>请拆成多个 Job，并说明每个 Job 的输入、输出和失败处理方式。</p>
+<h3 id="练习-3设计-checkpoint"><a class="header" href="#练习-3设计-checkpoint">练习 3：设计 Checkpoint</a></h3>
+<p>为代码开发 Agent 设计 checkpoint 策略。请说明：</p>
+<ol>
+<li>修改前保存什么？</li>
+<li>每次测试前保存什么？</li>
+<li>测试失败后如何恢复？</li>
+<li>用户要求回滚时如何处理？</li>
+</ol>
+<h3 id="练习-4设计-retry-策略"><a class="header" href="#练习-4设计-retry-策略">练习 4：设计 Retry 策略</a></h3>
+<p>请把下面错误分类为 transient、permanent、strategy_error、human_required。</p>
+<ol>
+<li>搜索 API 超时；</li>
+<li>用户没有提供产品 MOQ；</li>
+<li>连续搜索结果都是零售店；</li>
+<li>工具参数格式错误；</li>
+<li>邮件发送接口返回临时限流；</li>
+<li>Agent 需要确认是否可以承诺某项认证。</li>
+</ol>
+<h3 id="练习-5设计长任务界面"><a class="header" href="#练习-5设计长任务界面">练习 5：设计长任务界面</a></h3>
+<p>为一个教育 Agent 设计长任务产品界面。至少包含：</p>
+<ul>
+<li>任务列表；</li>
+<li>学生计划；</li>
+<li>待老师确认事项；</li>
+<li>每周报告；</li>
+<li>错误恢复或调整入口。</li>
+</ul>
+<hr />
+<h2 id="检查清单"><a class="header" href="#检查清单">检查清单</a></h2>
+<pre><code class="language-text">[ ] 我理解长任务是 Agent 产品化的重要分水岭。
+[ ] 我能区分 Task 和 Job。
+[ ] 我知道为什么长任务需要状态机。
+[ ] 我理解 Job Queue 和 Scheduler 的作用。
+[ ] 我知道 checkpoint 为什么重要。
+[ ] 我理解 resume 不是简单重跑，而是基于状态继续执行。
+[ ] 我知道 retry 需要按失败类型分类。
+[ ] 我理解用户必须能够取消长任务。
+[ ] 我知道人工审批会让任务进入 waiting_for_approval 状态。
+[ ] 我能设计外贸、教育或代码 Agent 的长任务流程。
+[ ] 我理解审计日志、通知和产品界面对长任务 Agent 的重要性。
+[ ] 我知道长任务必须有成本和预算控制。
+</code></pre>
+<hr />
+<h2 id="本章总结"><a class="header" href="#本章总结">本章总结</a></h2>
+<p>Long-running Agent 解决的是 Agent 如何跨越时间持续工作的能力。它让 Agent 从一次性对话工具，变成可以执行长期任务、等待人工确认、失败后恢复、周期运行和持续跟进的系统。</p>
+<p>本章强调，长任务不是让模型一次性思考更久，而是引入一套系统基础设施：Task、Job、状态机、队列、调度器、checkpoint、resume、retry、cancel、approval、notification、audit log 和成本控制。</p>
+<p>在真实场景中，外贸获客、教育监督、代码修改、运营监控都需要长任务能力。它们的共同点是：任务不会在一次回复中结束，系统必须保存状态、管理进度、支持暂停和恢复。</p>
+<p>Long-running Agent 也进一步说明了本书的核心观点：Agent 不是一个 prompt，而是一套系统工程。模型提供理解和判断，工具提供行动能力，状态机和队列提供执行控制，审批和通知提供人机协同，审计日志和 checkpoint 提供可靠性。</p>
+<p>到这里，第三篇“记忆、知识库与长期任务”已经完成。第 8 章让 Agent 记住经历，第 9 章让 Agent 使用外部知识，第 10 章让 Agent 跨越时间持续工作。下一篇我们将进入可控、安全、可评估的 Agent，重点讨论 Human-in-the-loop、Evaluation 和 Observability。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="chapter-09-rag-knowledge-base.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="chapter-11-human-in-the-loop.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="chapter-09-rag-knowledge-base.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="chapter-11-human-in-the-loop.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

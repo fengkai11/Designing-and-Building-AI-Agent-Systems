@@ -1,0 +1,290 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>练习参考答案与评分指南 - 从零构建 AI Agent 系统</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="一本面向工程实践的 AI Agent 系统学习教程：理论、架构、源码研究与工程实现。">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">从零构建 AI Agent 系统</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/fengkai11/Designing-and-Building-AI-Agent-Systems" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/fengkai11/Designing-and-Building-AI-Agent-Systems/edit/main/src/extras/exercise-answer-guide.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="练习参考答案与评分指南"><a class="header" href="#练习参考答案与评分指南">练习参考答案与评分指南</a></h1>
+<p>本文件不是标准答案库，而是给读者提供自检标准。Agent 系统设计题通常没有唯一答案，但优秀答案应该能说明目标、边界、状态、工具、风险、评估和人机协同。</p>
+<h2 id="一通用评分标准"><a class="header" href="#一通用评分标准">一、通用评分标准</a></h2>
+<p>每道设计题可按 10 分评分：</p>
+<div class="table-wrapper"><table><thead><tr><th>维度</th><th style="text-align: right">分值</th><th>判断标准</th></tr></thead><tbody>
+<tr><td>目标清晰</td><td style="text-align: right">2</td><td>是否明确任务目标、输入、输出和完成条件</td></tr>
+<tr><td>机制完整</td><td style="text-align: right">2</td><td>是否覆盖工具、上下文、状态、记忆、审批、评估中的关键项</td></tr>
+<tr><td>风险意识</td><td style="text-align: right">2</td><td>是否识别高风险动作并设置权限或人工确认</td></tr>
+<tr><td>工程可落地</td><td style="text-align: right">2</td><td>是否能转成模块、接口、数据结构或流程</td></tr>
+<tr><td>案例具体</td><td style="text-align: right">2</td><td>是否结合真实场景，而不是抽象口号</td></tr>
+</tbody></table>
+</div>
+<h2 id="二示范答案-1什么时候该用-agent"><a class="header" href="#二示范答案-1什么时候该用-agent">二、示范答案 1：什么时候该用 Agent</a></h2>
+<p>题目：判断“每天帮我寻找 20 个沙特钢卷尺潜在客户，并生成开发信草稿”是否适合 Agent。</p>
+<p>参考答案：适合 Agent，但不能完全自主。原因是该任务具备开放搜索、多步骤判断、客户筛选、长期去重、开发信生成和跟进调度等特征。它需要搜索工具、网页读取工具、客户去重、商机评分、开发信生成、审批队列和触达历史。高风险动作是发送邮件，因此只能生成草稿，不能自动发送。完成条件不是“找到 20 个网页”，而是产出通过初筛的客户列表、评分依据、联系方式、来源链接和待审批开发信。</p>
+<p>常见错误：只说“适合，因为 AI 可以搜索和写邮件”，没有说明风险和审批。</p>
+<h2 id="三示范答案-2工具权限分级"><a class="header" href="#三示范答案-2工具权限分级">三、示范答案 2：工具权限分级</a></h2>
+<p>题目：为代码 Agent 设计工具权限。</p>
+<p>参考答案：</p>
+<div class="table-wrapper"><table><thead><tr><th>工具</th><th>风险等级</th><th>策略</th></tr></thead><tbody>
+<tr><td>读取 repo 文件</td><td>低</td><td>允许自动执行，但限制在 repo 根目录内</td></tr>
+<tr><td>搜索文件</td><td>低</td><td>允许自动执行</td></tr>
+<tr><td>写入文件</td><td>中</td><td>小范围 patch 可在计划确认后执行</td></tr>
+<tr><td>运行测试</td><td>中</td><td>只允许白名单命令</td></tr>
+<tr><td>安装依赖</td><td>高</td><td>需要人工确认</td></tr>
+<tr><td>删除文件</td><td>高</td><td>必须 dry-run + 人工确认</td></tr>
+<tr><td>git push</td><td>高</td><td>禁止默认执行</td></tr>
+<tr><td>读取 SSH key / 环境密钥</td><td>极高</td><td>永远禁止</td></tr>
+</tbody></table>
+</div>
+<p>优秀答案要说明“为什么这样分级”，而不是只列工具名。</p>
+<h2 id="四示范答案-3外贸客户评分模型"><a class="header" href="#四示范答案-3外贸客户评分模型">四、示范答案 3：外贸客户评分模型</a></h2>
+<p>一个可用的外贸客户评分可以由 5 项组成：</p>
+<pre><code class="language-text">总分 = 品类匹配 30% + 客户类型 25% + 联系方式质量 15% + 来源可信度 15% + 市场优先级 15%
+</code></pre>
+<p>示例：</p>
+<ul>
+<li>官网明确销售 measuring tape、hand tools：品类匹配高；</li>
+<li>公司是 importer / distributor / wholesaler：客户类型高；</li>
+<li>有采购负责人邮箱：联系方式高；</li>
+<li>同时出现在官网、展会名录、LinkedIn：来源可信度高；</li>
+<li>位于目标国家且付款/物流风险可控：市场优先级高。</li>
+</ul>
+<p>常见错误：只按公司规模评分，忽略品类匹配和联系方式可用性。</p>
+<h2 id="五示范答案-4memory-写入判断"><a class="header" href="#五示范答案-4memory-写入判断">五、示范答案 4：Memory 写入判断</a></h2>
+<p>题目：哪些信息应该进入长期记忆？</p>
+<p>参考答案：</p>
+<p>应该写入：用户长期偏好、产品能力、客户黑名单、已经触达的客户、长期有效的业务规则、反复出现的失败模式。</p>
+<p>只保留在当前任务中：临时搜索关键词、一次性的中间草稿、当前网页摘要、临时排序结果。</p>
+<p>不应该记录或必须谨慎记录：敏感私人信息、未经确认的推断、可能伤害用户或客户权益的信息、来源不明的客户评价。</p>
+<p>关键原则：长期记忆不是“什么都记”，而是“记可复用、可解释、可修正的信息”。</p>
+<h2 id="六示范答案-5research-agent-评估"><a class="header" href="#六示范答案-5research-agent-评估">六、示范答案 5：Research Agent 评估</a></h2>
+<p>优秀评估集应包含：</p>
+<ol>
+<li>简单事实型任务；</li>
+<li>多来源综合任务；</li>
+<li>有争议观点任务；</li>
+<li>时间敏感任务；</li>
+<li>资料不足任务。</li>
+</ol>
+<p>评估指标包括来源质量、引用准确性、结论覆盖度、不确定性标注、结构清晰度、成本和延迟。</p>
+<h2 id="七12-个必做练习的建议顺序"><a class="header" href="#七12-个必做练习的建议顺序">七、12 个必做练习的建议顺序</a></h2>
+<pre><code class="language-text">1. 第 1 章：区分 Chatbot / Tool Calling / Agent
+2. 第 2 章：为外贸 Agent 建立能力模型
+3. 第 3 章：判断任务是否该 Agent 化
+4. 第 4 章：画 Agent Loop 状态图
+5. 第 5 章：设计工具权限表
+6. 第 6 章：设计上下文注入策略
+7. 第 8 章：设计 Memory 写入规则
+8. 第 10 章：设计长期任务恢复流程
+9. 第 11 章：设计审批队列
+10. 第 12 章：设计评估集
+11. 第 18 章：设计外贸 Agent 30 天试点
+12. 第 19 章：设计代码 Agent 最小 CLI 验收
+</code></pre>
+<p>完成这 12 个练习，比泛泛读完全书更重要。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../extras/exercise-summary.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../extras/code-directory-guide.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../extras/exercise-summary.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../extras/code-directory-guide.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

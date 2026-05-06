@@ -1,0 +1,1170 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>第 4 章：Agent Loop：从 Observe 到 Act - 从零构建 AI Agent 系统</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="一本面向工程实践的 AI Agent 系统学习教程：理论、架构、源码研究与工程实现。">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">从零构建 AI Agent 系统</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/fengkai11/Designing-and-Building-AI-Agent-Systems" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/fengkai11/Designing-and-Building-AI-Agent-Systems/edit/main/src/chapter-04-agent-loop.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="第-4-章agent-loop从-observe-到-act"><a class="header" href="#第-4-章agent-loop从-observe-到-act">第 4 章：Agent Loop：从 Observe 到 Act</a></h1>
+<blockquote>
+<p>下图给出本章最核心的执行循环，后文会围绕 Observe、Think、Plan、Act、Reflect 与 Stop 逐步展开。</p>
+</blockquote>
+<p><img src="figures/fig-04-01-agent-loop-execution-cycle.png" alt="图 4-1 Agent Loop 执行循环图" /></p>
+<p><em>图 4-1 Agent Loop 执行循环图</em></p>
+<p>在前面三章中，我们一直在强调：Agent 不是一个提示词，也不是一次工具调用，而是一套围绕目标持续执行的系统工程。到了本章，我们开始真正进入 Agent 内部，讨论一个最基础、也最容易被误解的核心机制：Agent Loop。</p>
+<p>如果说工具系统是 Agent 的手脚，上下文工程是 Agent 的工作记忆，记忆系统是 Agent 的长期经验，那么 Agent Loop 就是 Agent 的心跳。它决定 Agent 如何从用户目标出发，观察当前状态，思考下一步，调用工具，接收结果，再继续推进任务，直到完成或停止。</p>
+<p>很多初学者第一次写 Agent，通常会写出类似这样的代码：</p>
+<pre><code class="language-python">response = model.chat("请帮我完成这个任务")
+print(response)
+</code></pre>
+<p>这当然可以得到一个回答，但它不是 Agent。因为这里没有持续观察，没有行动反馈，没有任务状态，也没有下一步决策。模型只是回答了一次。</p>
+<p>后来，开发者可能会加上工具调用：</p>
+<pre><code class="language-python">response = model.chat(messages, tools=tools)
+</code></pre>
+<p>这已经比单轮问答更进一步。模型可以在需要时调用工具。但如果系统只是“模型请求工具，工具返回结果，模型再回答”，仍然只能算一个工具增强对话系统。真正的 Agent 需要一个循环：它必须能够在多轮工具调用和状态变化中持续推进目标。</p>
+<p>这个循环，就是 Agent Loop。</p>
+<p>本章会从概念、模式、实现和工程化四个层面展开。我们先理解 Agent Loop 为什么重要，再拆解 Observe、Think、Plan、Act、Reflect、Stop 等关键环节，然后实现一个最小 Agent Loop，最后讨论真实工程中必须处理的停止条件、失败恢复、日志记录、循环失控和人类干预。</p>
+<p>本章的重点不是写一个“看起来能跑”的 Demo，而是让你真正理解 Agent 为什么需要循环，循环中每一步承担什么职责，以及如何让这个循环可控。</p>
+<hr />
+<h2 id="41-为什么-agent-需要-loop"><a class="header" href="#41-为什么-agent-需要-loop">4.1 为什么 Agent 需要 Loop</a></h2>
+<p>人类完成复杂任务时，很少是一次性想清楚全部步骤，然后机械执行到底。更多时候，我们是在不断观察、判断、行动和修正。</p>
+<p>例如，你想调研沙特市场的钢卷尺潜在客户。你可能先用搜索引擎输入关键词 “Saudi Arabia measuring tape importer”。如果结果不理想，你会换成 “hardware distributor Saudi Arabia”“tools wholesaler Riyadh”“construction tools supplier KSA”。当你打开一个公司网站时，你会观察它主营什么产品，是不是批发商，有没有联系方式，有没有进口业务信号。如果发现它只是零售小店，你会排除。如果发现它是大型五金分销商，你会记录下来。你还可能根据搜索中发现的新词调整后续搜索策略。</p>
+<p>这整个过程不是一次推理，而是一个循环。</p>
+<p>同样，代码开发也是循环。你接到一个 bug，先读错误日志，再搜索代码，再提出假设，再改一小处，再运行测试。如果测试失败，你再读新的错误信息，继续修正。没有一个开发者能在不了解项目的情况下，一次性写出完整正确补丁。</p>
+<p>教育辅导也是循环。老师看学生错题，判断错因，布置练习，观察反馈，再调整教学。一次讲解不能保证学生真正掌握，必须通过持续反馈判断。</p>
+<p>这些现实任务都具备一个共同特点：每一步行动都会改变下一步判断的依据。</p>
+<p>Agent Loop 正是为了模拟这种“基于反馈的持续执行”。</p>
+<p>一个最简单的 Agent Loop 可以抽象成：</p>
+<pre><code class="language-text">while not done:
+    observe current state
+    decide next action
+    execute action
+    observe result
+    update state
+</code></pre>
+<p>这段伪代码看起来很简单，但它包含了 Agent 和普通模型调用的根本区别。普通模型调用只生成一次输出；Agent Loop 则让模型进入一个可持续推进任务的控制结构。</p>
+<p>举一个具体例子。</p>
+<p>用户输入：</p>
+<pre><code class="language-text">帮我找到 5 家阿联酋的五金工具批发商，并判断它们是否适合推广钢卷尺。
+</code></pre>
+<p>如果只是单次回答，模型可能凭已有知识生成一个列表，但列表可能过时、虚构或无法验证。</p>
+<p>如果是 Agent Loop，它的执行可能是：</p>
+<pre><code class="language-text">第 1 步：理解任务，确定目标国家、客户类型、产品。
+第 2 步：调用搜索工具，搜索 UAE hardware tools wholesaler。
+第 3 步：读取搜索结果，发现很多是零售电商。
+第 4 步：调整关键词为 building materials distributor UAE。
+第 5 步：打开一个候选公司网站，提取主营业务和联系方式。
+第 6 步：判断该公司是否批发五金工具。
+第 7 步：记录合格客户。
+第 8 步：重复搜索和筛选，直到找到 5 家或达到搜索上限。
+第 9 步：生成最终表格和理由。
+</code></pre>
+<p>这里每一步都依赖前一步的结果。搜索结果不好，就换关键词；网页信息不足，就标记低置信度；客户数量不够，就继续搜索；达到目标后，就停止。</p>
+<p>这就是 Agent Loop 的价值。</p>
+<p>但是，Loop 也带来风险。如果没有停止条件，Agent 可能无限搜索；如果没有状态记录，它可能重复访问同一个网站；如果没有工具权限控制，它可能执行危险动作；如果没有日志，失败后无法复盘；如果没有人工确认，它可能把草稿直接发送给客户。</p>
+<p>所以，学习 Agent Loop 不能只学“怎么循环”，还要学“如何让循环停下来、可观察、可审计、可控制”。</p>
+<hr />
+<h2 id="42-agent-loop-的基本结构"><a class="header" href="#42-agent-loop-的基本结构">4.2 Agent Loop 的基本结构</a></h2>
+<p>一个完整的 Agent Loop 通常可以拆成六个环节：Observe、Think、Plan、Act、Reflect、Stop。</p>
+<p>这六个词不是某个框架的固定接口，而是一种理解 Agent 行为的通用方式。不同框架可能用不同名字，有的把 Think 和 Plan 合并，有的没有显式 Reflect，有的把 Stop 做成状态图终止条件。但背后的问题是相似的。</p>
+<h3 id="421-observe观察当前状态"><a class="header" href="#421-observe观察当前状态">4.2.1 Observe：观察当前状态</a></h3>
+<p>Observe 是 Agent 获取当前信息的过程。它回答的问题是：现在我知道什么？任务处于什么状态？外部环境给了我什么反馈？</p>
+<p>在聊天场景中，Observe 可能只是读取用户输入。</p>
+<p>在工具调用场景中，Observe 还包括读取工具返回结果。</p>
+<p>在浏览器 Agent 中，Observe 可能是网页截图、DOM 文本、可点击元素列表、当前 URL 和页面标题。</p>
+<p>在代码 Agent 中，Observe 可能是文件内容、目录结构、测试输出、git diff、错误日志。</p>
+<p>在外贸 Agent 中，Observe 可能是搜索结果、公司官网内容、邮箱提取结果、客户评分表、历史触达记录。</p>
+<p>举例来说，代码 Agent 运行测试后得到：</p>
+<pre><code class="language-text">FAILED tests/test_auth.py::test_login_with_email_code
+AssertionError: expected status_code 200, got 500
+</code></pre>
+<p>这就是新的 observation。Agent 必须把它纳入下一步判断，而不是继续按照原计划盲目执行。</p>
+<p>Observe 的质量决定了 Agent 后续决策的质量。如果观察信息不准确、不完整或没有结构，Agent 很容易误判。</p>
+<p>例如，一个浏览器 Agent 如果只能看到网页截图，但看不到可点击元素的语义，它可能不知道哪个按钮是“下一页”。一个代码 Agent 如果只看到报错最后一行，看不到完整栈信息，可能修错地方。一个外贸 Agent 如果只看到公司名称，看不到主营业务，就无法判断是否适合钢卷尺。</p>
+<p>因此，工程上经常需要把 observation 做成结构化格式，而不是简单文本。</p>
+<p>例如外贸客户观察可以表示成：</p>
+<pre><code class="language-json">{
+  "source": "search_result",
+  "query": "UAE hardware distributor",
+  "company_name": "Example Hardware Trading LLC",
+  "url": "https://example.com",
+  "snippet": "Wholesale supplier of tools, building materials and industrial supplies in Dubai.",
+  "signals": ["wholesale", "tools", "Dubai", "industrial supplies"],
+  "uncertainties": ["no email found yet"]
+}
+</code></pre>
+<p>这样的结构比一段自由文本更适合后续处理。</p>
+<h3 id="422-think理解和判断"><a class="header" href="#422-think理解和判断">4.2.2 Think：理解和判断</a></h3>
+<p>Think 是 Agent 对当前观察进行解释的过程。它回答的问题是：这些信息意味着什么？现在应该关注什么？任务是否发生变化？</p>
+<p>例如，外贸 Agent 观察到一个公司网站写着：</p>
+<pre><code class="language-text">We are a leading supplier of hand tools, measuring tools, power tools and construction materials in Dubai.
+</code></pre>
+<p>它需要判断：这个公司可能适合钢卷尺。因为 hand tools 和 measuring tools 是强相关信号，Dubai 是目标地区，supplier 可能意味着分销或批发。</p>
+<p>如果网站写的是：</p>
+<pre><code class="language-text">We provide home decoration services and interior design solutions.
+</code></pre>
+<p>Agent 应该判断：这个公司不是理想客户，除非它有工程采购部门。</p>
+<p>Think 不一定要暴露完整推理过程给用户。在工程中，我们更关心它输出可执行判断，例如：是否继续、调用什么工具、记录什么状态、需要什么确认。</p>
+<p>一个安全的 Think 输出可以是：</p>
+<pre><code class="language-json">{
+  "assessment": "candidate_relevant",
+  "reason": "Website mentions hand tools and measuring tools; target location matches UAE.",
+  "next_need": "extract_contact_info",
+  "confidence": 0.78
+}
+</code></pre>
+<p>这个结构比让模型自由输出长篇思考更稳定，也更容易被系统使用。</p>
+<h3 id="423-plan决定下一步或多步计划"><a class="header" href="#423-plan决定下一步或多步计划">4.2.3 Plan：决定下一步或多步计划</a></h3>
+<p>Plan 是把判断转化为执行路线。它回答的问题是：接下来要做什么？</p>
+<p>有些 Agent 每次只计划一步。例如 ReAct 模式中，模型观察当前状态后，直接决定下一步工具调用。</p>
+<p>有些 Agent 会先生成多步计划。例如 Plan-and-Execute 模式中，模型先列出整体计划，再由执行器逐步完成。</p>
+<p>例如，对于“寻找 5 家阿联酋五金工具批发商”，多步计划可能是：</p>
+<pre><code class="language-text">1. 搜索 UAE hardware tools wholesaler / distributor。
+2. 收集前 20 个候选网站。
+3. 逐个判断是否为批发商或分销商。
+4. 提取公司名称、网站、主营产品、邮箱、国家城市。
+5. 根据产品匹配度和联系方式质量评分。
+6. 输出前 5 家，并说明理由。
+</code></pre>
+<p>但在执行中，这个计划可能需要调整。如果搜索结果主要是零售电商，Agent 应该改变搜索策略。如果候选客户不够，Agent 应该扩大关键词。如果找到大型公司但没有邮箱，Agent 应该标记“需人工补充联系人”。</p>
+<p>所以，Plan 不是一次写死的路线，而是可以随着 observation 更新。</p>
+<h3 id="424-act执行动作"><a class="header" href="#424-act执行动作">4.2.4 Act：执行动作</a></h3>
+<p>Act 是 Agent 通过工具改变状态或获取信息的过程。它回答的问题是：现在调用哪个工具？用什么参数？期望得到什么结果？</p>
+<p>Act 可以是低风险的信息动作，例如搜索、读取文件、查询数据库。</p>
+<p>也可以是中风险的写入动作，例如创建草稿、写入报告、修改本地文件。</p>
+<p>也可能是高风险动作，例如发送邮件、提交代码、删除文件、支付订单。</p>
+<p>不同风险等级的动作应该有不同控制策略。</p>
+<p>例如：</p>
+<pre><code class="language-text">search_web：可以自动执行。
+read_file：通常可以自动执行，但要限制目录范围。
+write_file：可以在工作区内自动执行，但需要记录 diff。
+send_email：必须人工确认。
+delete_file：必须人工确认，且需要可恢复。
+execute_shell：需要命令白名单或用户确认。
+</code></pre>
+<p>在 Agent Loop 中，Act 不是“模型想做什么就做什么”。模型只能提出动作请求，系统负责验证、执行和记录。</p>
+<p>一个工具调用请求可以表示成：</p>
+<pre><code class="language-json">{
+  "tool_name": "search_web",
+  "arguments": {
+    "query": "UAE hardware tools wholesale distributor measuring tools",
+    "max_results": 10
+  },
+  "reason": "Need to find candidate wholesale distributors in UAE."
+}
+</code></pre>
+<p>系统收到请求后，要检查工具是否存在、参数是否有效、是否超出权限、是否超过调用频率。如果通过，才真正执行。</p>
+<h3 id="425-reflect反思结果和修正策略"><a class="header" href="#425-reflect反思结果和修正策略">4.2.5 Reflect：反思结果和修正策略</a></h3>
+<p>Reflect 是 Agent 对执行结果进行复盘和调整。它回答的问题是：刚才的动作有效吗？是否接近目标？需要改变策略吗？</p>
+<p>很多简单 Agent 没有显式 Reflect，只是把工具结果放回上下文，让模型下一轮自然处理。但在复杂任务中，显式反思很有价值。</p>
+<p>例如，外贸 Agent 连续搜索三次都找到零售网站，就应该反思：当前关键词太偏终端消费者，需要改用 distributor、wholesale、importer、building materials supplier 等词。</p>
+<p>代码 Agent 修改后测试失败，也应该反思：失败是语法错误、依赖缺失、接口不兼容，还是测试预期需要更新？</p>
+<p>教育 Agent 发现学生连续做错同类题，也应该反思：当前讲解方式可能不够，应该降低难度或回到前置知识点。</p>
+<p>Reflect 的输出不应该只是“我应该更努力”。它需要具体调整。</p>
+<p>例如：</p>
+<pre><code class="language-json">{
+  "reflection": "Search results are dominated by retail e-commerce pages.",
+  "strategy_update": "Use B2B and distributor-oriented keywords; include terms such as 'LLC', 'trading', 'building materials', and 'industrial supplies'.",
+  "next_action": "search_web"
+}
+</code></pre>
+<p>Reflect 的作用，是避免 Agent 在错误方向上机械重复。</p>
+<h3 id="426-stop判断何时停止"><a class="header" href="#426-stop判断何时停止">4.2.6 Stop：判断何时停止</a></h3>
+<p>Stop 是 Agent Loop 中最容易被忽视、却极其重要的环节。它回答的问题是：什么时候应该结束？</p>
+<p>停止条件可以分为目标完成、资源耗尽、失败终止、等待人工和安全终止。</p>
+<p>目标完成是最理想情况。例如已经找到 5 家符合条件的客户，并生成表格。</p>
+<p>资源耗尽是指达到最大步数、最大 token、最大搜索次数、最大时间或预算上限。</p>
+<p>失败终止是指连续失败，无法继续推进。例如搜索工具不可用，网页无法访问，模型连续输出无效工具调用。</p>
+<p>等待人工是指任务进入审批节点。例如开发信已经生成，需要用户确认是否发送。</p>
+<p>安全终止是指发现高风险行为。例如模型试图访问禁止路径、执行危险命令、泄露敏感信息。</p>
+<p>一个没有 Stop 设计的 Agent 很容易失控。它可能无限搜索，重复调用工具，反复修改代码，或者在没有足够证据时强行完成任务。</p>
+<p>因此，最小 Agent Loop 中必须包含停止条件。即使只是学习 Demo，也应该设置最大步数。</p>
+<p>例如：</p>
+<pre><code class="language-python">MAX_STEPS = 10
+for step in range(MAX_STEPS):
+    action = agent.decide(state)
+    if action.type == "final_answer":
+        break
+    result = execute_tool(action)
+    state.add_observation(result)
+else:
+    state.mark_failed("Reached max steps without completion")
+</code></pre>
+<p>这个 <code>MAX_STEPS</code> 看起来简单，却是防止 Agent 无限循环的第一道防线。</p>
+<hr />
+<h2 id="43-react最经典的-agent-loop-模式"><a class="header" href="#43-react最经典的-agent-loop-模式">4.3 ReAct：最经典的 Agent Loop 模式</a></h2>
+<p>Agent Loop 有很多实现方式，其中最经典的是 ReAct。ReAct 是 Reasoning and Acting 的缩写，核心思想是让模型在推理和行动之间交替进行。</p>
+<p>一个典型 ReAct 循环可以表示为：</p>
+<pre><code class="language-text">Thought: 我需要先搜索目标信息。
+Action: search_web(query="...")
+Observation: 搜索结果如下...
+Thought: 这些结果中第 2 个更相关，我需要打开网页。
+Action: open_url(url="...")
+Observation: 网页内容如下...
+Thought: 我已经获得足够信息，可以回答。
+Final: ...
+</code></pre>
+<p>在早期 Agent 教程中，ReAct 经常以显式文本形式出现。模型被要求输出 Thought、Action、Observation、Final。这种方式非常直观，适合教学。</p>
+<p>例如，用户问：</p>
+<pre><code class="language-text">帮我判断 Example Hardware Trading LLC 是否适合推广钢卷尺。
+</code></pre>
+<p>ReAct 过程可能是：</p>
+<pre><code class="language-text">Thought: 我需要了解这家公司的主营业务和客户类型。
+Action: search_web(query="Example Hardware Trading LLC measuring tools")
+Observation: 搜索结果显示该公司供应 hand tools, measuring tapes, power tools, building materials。
+Thought: 该公司有 measuring tapes 和 hand tools 相关信号，需要查看联系方式和业务类型。
+Action: open_url(url="https://example.com/about")
+Observation: About 页面显示它是 Dubai 的 wholesale distributor。
+Thought: 它是目标市场中的五金工具批发商，和钢卷尺高度相关。
+Final: 适合推广，理由是...
+</code></pre>
+<p>ReAct 的优点是简单、灵活、容易理解。它特别适合开放探索任务，因为模型可以根据每次 observation 决定下一步。</p>
+<p>但 ReAct 也有缺点。</p>
+<p>第一，它容易走偏。因为每一步都由模型即时决定，如果上下文提示不清，模型可能选择无关工具。</p>
+<p>第二，它容易重复。模型可能多次搜索相似关键词，或者反复读取同一网页。</p>
+<p>第三，它不擅长长任务规划。对于需要几十步的任务，纯 ReAct 可能缺少整体路线。</p>
+<p>第四，它的中间推理如果完全暴露在上下文中，会占用大量 token。</p>
+<p>第五，它不天然提供状态管理、审批、恢复和评估。</p>
+<p>所以，ReAct 是理解 Agent Loop 的好起点，但不能把 ReAct 等同于完整 Agent 系统。</p>
+<p>在工程中，我们可以保留 ReAct 的“观察-行动”思想，但把输出结构化，让系统更可控。</p>
+<p>例如，让模型输出：</p>
+<pre><code class="language-json">{
+  "decision_type": "tool_call",
+  "tool_name": "search_web",
+  "arguments": {
+    "query": "UAE measuring tools distributor wholesale"
+  },
+  "rationale": "Need more candidates from B2B distributor sources."
+}
+</code></pre>
+<p>而不是让模型自由生成一段 <code>Thought</code> 文本。这样系统更容易解析、验证和执行。</p>
+<hr />
+<h2 id="44-plan-and-execute先规划再执行"><a class="header" href="#44-plan-and-execute先规划再执行">4.4 Plan-and-Execute：先规划，再执行</a></h2>
+<p>与 ReAct 相比，Plan-and-Execute 更强调先生成整体计划，再逐步执行。</p>
+<p>它适合目标比较明确、任务链路较长、需要阶段性管理的场景。</p>
+<p>例如用户说：</p>
+<pre><code class="language-text">帮我研究 OpenClaw、Hermes、Claude Code 三类 Agent 产品，比较它们对构建 Athena AI 员工系统的启发。
+</code></pre>
+<p>如果用纯 ReAct，Agent 可能边搜边写，容易散乱。更合理的做法是先生成计划：</p>
+<pre><code class="language-text">1. 明确比较维度：产品形态、任务类型、工具系统、长期运行、用户交互、安全边界。
+2. 分别收集 OpenClaw 的公开信息和源码结构。
+3. 收集 Hermes 的公开资料。
+4. 基于公开行为分析 Claude Code 的工作流特征。
+5. 生成对照表。
+6. 提炼 Athena 可借鉴模块。
+7. 标注哪些是已确认事实，哪些是设计推断。
+</code></pre>
+<p>然后执行器按计划逐步完成。</p>
+<p>Plan-and-Execute 的优点是结构清晰，适合长任务，也更容易展示给用户审批。用户可以在执行前看到计划，并修改方向。</p>
+<p>例如，外贸 Agent 开始搜索前，可以先展示：</p>
+<pre><code class="language-text">我计划按以下策略寻找客户：
+1. 先搜索 UAE/Saudi 五金工具批发商。
+2. 再搜索建筑材料和工业用品分销商。
+3. 排除零售电商和平台店铺。
+4. 对候选客户按产品匹配度、客户类型、联系方式质量评分。
+5. 只生成开发信草稿，不自动发送。
+</code></pre>
+<p>用户可以补充：</p>
+<pre><code class="language-text">不要找 Saudi，先只找 UAE；优先 Dubai 和 Sharjah。
+</code></pre>
+<p>这样 Agent 的执行方向会更稳定。</p>
+<p>但 Plan-and-Execute 也有问题。</p>
+<p>第一，计划可能一开始就错。如果信息不足，模型生成的计划可能不适合实际情况。</p>
+<p>第二，执行中环境变化，计划需要调整。如果搜索不到足够客户，原计划必须修改。</p>
+<p>第三，计划过细会降低灵活性，计划过粗又没有指导意义。</p>
+<p>因此，工程中常用的不是“固定计划执行到底”，而是“计划 + 执行 + 重新规划”。</p>
+<p>可以表示成：</p>
+<pre><code class="language-text">生成初始计划
+执行当前步骤
+观察结果
+判断计划是否仍然有效
+如果无效，更新计划
+继续执行
+</code></pre>
+<p>这其实又回到了 Loop，只是 Loop 中多了一个显式计划对象。</p>
+<hr />
+<h2 id="45-workflow--agent真实产品中更常见的模式"><a class="header" href="#45-workflow--agent真实产品中更常见的模式">4.5 Workflow + Agent：真实产品中更常见的模式</a></h2>
+<p>在真实产品里，纯 ReAct 或纯 Plan-and-Execute 都不是最终答案。更常见的是 Workflow + Agent。</p>
+<p>也就是说，系统用工作流控制大方向，用 Agent 处理其中不确定、需要判断的节点。</p>
+<p>例如外贸客户开发流程可以设计成：</p>
+<pre><code class="language-text">输入任务配置
+↓
+生成搜索策略
+↓
+搜索候选客户
+↓
+客户网页读取
+↓
+客户类型判断
+↓
+客户评分
+↓
+生成开发信草稿
+↓
+人工审批
+↓
+发送或导出
+↓
+跟进调度
+</code></pre>
+<p>这个流程的大框架是确定的，不需要模型自由决定。但是每个节点内部可以使用 Agent 能力。</p>
+<p>例如“客户类型判断”节点需要模型理解网页内容；“搜索策略生成”节点需要模型根据产品和国家设计关键词；“开发信草稿”节点需要模型写作；“回复理解”节点需要模型判断客户意图。</p>
+<p>这种方式有几个好处。</p>
+<p>首先，它更可控。系统知道任务处于哪个阶段，不会完全靠模型即兴发挥。</p>
+<p>其次，它更容易恢复。任务失败时，可以从某个节点重新开始，而不是整个上下文丢失。</p>
+<p>再次，它更容易审批。高风险节点可以固定设置人工确认。</p>
+<p>最后，它更适合产品化。前端可以展示阶段进度，而不是只显示一堆模型日志。</p>
+<p>代码 Agent 也适合这种模式：</p>
+<pre><code class="language-text">理解需求
+↓
+分析代码仓库
+↓
+生成修改计划
+↓
+用户确认计划
+↓
+修改文件
+↓
+运行测试
+↓
+失败修复循环
+↓
+生成 diff
+↓
+用户 review
+</code></pre>
+<p>在这个流程中，Agent 可以智能分析代码和修复测试失败，但不能跳过用户确认直接提交。</p>
+<p>教育 Agent 也是类似：</p>
+<pre><code class="language-text">收集作业结果
+↓
+识别错因
+↓
+更新学生画像
+↓
+生成练习推荐
+↓
+老师确认
+↓
+推送给学生
+↓
+跟踪完成情况
+</code></pre>
+<p>可以看到，真实系统中的 Agent Loop 往往不是一个孤立 <code>while</code> 循环，而是嵌入在任务状态机和工作流中的局部循环。</p>
+<p>这也是为什么本书后续会继续讲任务状态、长期调度、审批和可观测性。没有这些机制，Agent Loop 很难进入真实产品。</p>
+<hr />
+<h2 id="46-最小-agent-loop-的实现"><a class="header" href="#46-最小-agent-loop-的实现">4.6 最小 Agent Loop 的实现</a></h2>
+<p>下面我们实现一个教学版最小 Agent Loop。它不会依赖复杂框架，也不追求生产可用，而是帮助你理解基本结构。</p>
+<p>我们先定义几个核心对象：TaskState、Action、ToolResult、Agent。</p>
+<h3 id="461-taskstate任务状态"><a class="header" href="#461-taskstate任务状态">4.6.1 TaskState：任务状态</a></h3>
+<p>任务状态需要记录用户目标、执行历史、当前结果和停止原因。</p>
+<pre><code class="language-python">from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional
+
+@dataclass
+class StepRecord:
+    step_id: int
+    action: Dict[str, Any]
+    observation: Dict[str, Any]
+
+@dataclass
+class TaskState:
+    goal: str
+    steps: List[StepRecord] = field(default_factory=list)
+    final_answer: Optional[str] = None
+    status: str = "running"
+    stop_reason: Optional[str] = None
+
+    def add_step(self, action: Dict[str, Any], observation: Dict[str, Any]) -&gt; None:
+        self.steps.append(
+            StepRecord(
+                step_id=len(self.steps) + 1,
+                action=action,
+                observation=observation,
+            )
+        )
+
+    def mark_done(self, answer: str) -&gt; None:
+        self.status = "done"
+        self.final_answer = answer
+        self.stop_reason = "goal_completed"
+
+    def mark_failed(self, reason: str) -&gt; None:
+        self.status = "failed"
+        self.stop_reason = reason
+</code></pre>
+<p>这里的状态非常简单，但已经包含了关键思想：Agent 每一步都要留下记录，而不是只把信息放在 prompt 里。</p>
+<p>如果后续出现问题，我们至少可以查看它调用了哪些动作、得到哪些观察、为什么停止。</p>
+<h3 id="462-tool-registry工具注册表"><a class="header" href="#462-tool-registry工具注册表">4.6.2 Tool Registry：工具注册表</a></h3>
+<p>本章先实现一个非常简化的工具注册表，下一章会专门深入工具系统。</p>
+<pre><code class="language-python">from typing import Callable
+
+class ToolRegistry:
+    def __init__(self):
+        self._tools: Dict[str, Callable[..., Dict[str, Any]]] = {}
+
+    def register(self, name: str, func: Callable[..., Dict[str, Any]]) -&gt; None:
+        self._tools[name] = func
+
+    def execute(self, name: str, arguments: Dict[str, Any]) -&gt; Dict[str, Any]:
+        if name not in self._tools:
+            return {
+                "ok": False,
+                "error": f"Tool not found: {name}"
+            }
+        try:
+            return self._tools[name](**arguments)
+        except Exception as exc:
+            return {
+                "ok": False,
+                "error": str(exc)
+            }
+</code></pre>
+<p>注册几个模拟工具：</p>
+<pre><code class="language-python">def mock_search(query: str, max_results: int = 5) -&gt; Dict[str, Any]:
+    return {
+        "ok": True,
+        "results": [
+            {
+                "title": "Dubai Industrial Tools Trading LLC",
+                "url": "https://example.com/dubai-tools",
+                "snippet": "Wholesale supplier of hand tools, measuring tools and construction materials."
+            },
+            {
+                "title": "Home Decor UAE",
+                "url": "https://example.com/home-decor",
+                "snippet": "Interior design and home decoration services."
+            }
+        ][:max_results]
+    }
+
+def save_note(filename: str, content: str) -&gt; Dict[str, Any]:
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write(content)
+    return {
+        "ok": True,
+        "filename": filename
+    }
+</code></pre>
+<h3 id="463-agent-决策接口"><a class="header" href="#463-agent-决策接口">4.6.3 Agent 决策接口</a></h3>
+<p>在真实系统中，Agent 的 <code>decide</code> 方法会调用大模型。为了突出结构，我们先用一个伪决策器模拟。</p>
+<pre><code class="language-python">class SimpleAgent:
+    def decide(self, state: TaskState) -&gt; Dict[str, Any]:
+        if len(state.steps) == 0:
+            return {
+                "type": "tool_call",
+                "tool_name": "search",
+                "arguments": {
+                    "query": state.goal,
+                    "max_results": 5
+                }
+            }
+
+        last_observation = state.steps[-1].observation
+        if last_observation.get("ok") and "results" in last_observation:
+            results = last_observation["results"]
+            relevant = [
+                r for r in results
+                if "tools" in r["snippet"].lower() or "measuring" in r["snippet"].lower()
+            ]
+            answer = "找到以下可能相关客户：\n"
+            for item in relevant:
+                answer += f"- {item['title']}：{item['snippet']}\n"
+            return {
+                "type": "final_answer",
+                "answer": answer
+            }
+
+        return {
+            "type": "final_answer",
+            "answer": "未找到足够相关信息。"
+        }
+</code></pre>
+<p>这个示例很简单：第一步搜索，第二步整理结果并结束。</p>
+<p>它不是智能 Agent，但它已经展示了 Loop 的结构。</p>
+<h3 id="464-运行循环"><a class="header" href="#464-运行循环">4.6.4 运行循环</a></h3>
+<p>最后写运行器：</p>
+<pre><code class="language-python">class AgentRunner:
+    def __init__(self, agent: SimpleAgent, tools: ToolRegistry, max_steps: int = 5):
+        self.agent = agent
+        self.tools = tools
+        self.max_steps = max_steps
+
+    def run(self, goal: str) -&gt; TaskState:
+        state = TaskState(goal=goal)
+
+        for _ in range(self.max_steps):
+            action = self.agent.decide(state)
+
+            if action["type"] == "final_answer":
+                state.mark_done(action["answer"])
+                return state
+
+            if action["type"] == "tool_call":
+                observation = self.tools.execute(
+                    action["tool_name"],
+                    action.get("arguments", {})
+                )
+                state.add_step(action, observation)
+                continue
+
+            state.mark_failed(f"Unknown action type: {action.get('type')}")
+            return state
+
+        state.mark_failed("Reached max steps")
+        return state
+</code></pre>
+<p>运行：</p>
+<pre><code class="language-python">if __name__ == "__main__":
+    tools = ToolRegistry()
+    tools.register("search", mock_search)
+    tools.register("save_note", save_note)
+
+    runner = AgentRunner(SimpleAgent(), tools, max_steps=5)
+    state = runner.run("UAE hardware tools wholesaler measuring tape")
+
+    print("Status:", state.status)
+    print("Stop reason:", state.stop_reason)
+    print("Answer:")
+    print(state.final_answer)
+</code></pre>
+<p>输出可能是：</p>
+<pre><code class="language-text">Status: done
+Stop reason: goal_completed
+Answer:
+找到以下可能相关客户：
+- Dubai Industrial Tools Trading LLC：Wholesale supplier of hand tools, measuring tools and construction materials.
+</code></pre>
+<p>这个最小例子有几个关键点：</p>
+<p>第一，任务有状态，而不是只有一次模型回答。</p>
+<p>第二，Agent 每一步输出 action，系统执行 action。</p>
+<p>第三，工具结果作为 observation 回到状态。</p>
+<p>第四，循环有最大步数，防止无限执行。</p>
+<p>第五，最终状态记录停止原因。</p>
+<p>这就是 Agent Loop 的最小骨架。</p>
+<hr />
+<h2 id="47-把模型接入-agent-loop"><a class="header" href="#47-把模型接入-agent-loop">4.7 把模型接入 Agent Loop</a></h2>
+<p>上面的 SimpleAgent 是手写逻辑。真实 Agent 需要让大模型根据状态决定下一步。</p>
+<p>但接入模型时要注意：不要让模型输出完全自由的文本，而要让它输出结构化决策。</p>
+<p>一个简化提示词可以是：</p>
+<pre><code class="language-text">你是一个任务执行 Agent。
+你需要根据用户目标和历史观察，决定下一步动作。
+
+你只能输出 JSON，格式如下：
+
+如果需要调用工具：
+{
+  "type": "tool_call",
+  "tool_name": "工具名",
+  "arguments": { ... },
+  "reason": "为什么调用"
+}
+
+如果任务完成：
+{
+  "type": "final_answer",
+  "answer": "最终答案"
+}
+
+如果需要人工确认：
+{
+  "type": "need_approval",
+  "question": "需要用户确认的问题"
+}
+</code></pre>
+<p>然后把当前状态压缩后传给模型。</p>
+<pre><code class="language-python">import json
+
+class LLMAgent:
+    def __init__(self, model_client):
+        self.model_client = model_client
+
+    def decide(self, state: TaskState) -&gt; Dict[str, Any]:
+        messages = self.build_messages(state)
+        raw = self.model_client.chat(messages)
+        return json.loads(raw)
+
+    def build_messages(self, state: TaskState) -&gt; List[Dict[str, str]]:
+        history = []
+        for step in state.steps[-5:]:
+            history.append({
+                "step_id": step.step_id,
+                "action": step.action,
+                "observation": step.observation,
+            })
+
+        prompt = f"""
+用户目标：{state.goal}
+
+最近执行历史：
+{json.dumps(history, ensure_ascii=False, indent=2)}
+
+请决定下一步动作。
+"""
+        return [
+            {"role": "system", "content": "你是一个安全、谨慎的任务执行 Agent。"},
+            {"role": "user", "content": prompt}
+        ]
+</code></pre>
+<p>这里有几个工程重点。</p>
+<p>第一，只传最近几步历史，避免上下文无限增长。更完整的历史应该保存在状态数据库和 trace 系统中，而不是全部塞给模型。</p>
+<p>第二，要求模型输出 JSON，方便系统解析。真实项目还需要 JSON schema 校验和失败重试。</p>
+<p>第三，模型只是决策者，不直接执行工具。系统必须验证工具名和参数。</p>
+<p>第四，<code>need_approval</code> 是一种动作类型。Agent 不一定只有工具调用和最终回答，它也可以进入等待人工状态。</p>
+<hr />
+<h2 id="48-agent-loop-中的状态设计"><a class="header" href="#48-agent-loop-中的状态设计">4.8 Agent Loop 中的状态设计</a></h2>
+<p>很多初学者写 Agent 时，会把所有信息都追加到 messages 里：</p>
+<pre><code class="language-python">messages.append({"role": "assistant", "content": thought})
+messages.append({"role": "tool", "content": tool_result})
+</code></pre>
+<p>这样做在简单 Demo 中可以，但在真实系统中会出现很多问题。</p>
+<p>第一，上下文会越来越长，成本增加，模型注意力分散。</p>
+<p>第二，历史信息缺少结构，难以查询和复盘。</p>
+<p>第三，无法区分哪些是任务状态，哪些是工具结果，哪些是用户偏好。</p>
+<p>第四，任务失败后难以恢复，因为状态只存在于 prompt 中。</p>
+<p>因此，Agent Loop 需要显式状态设计。</p>
+<p>一个稍微完整的任务状态可以包括：</p>
+<pre><code class="language-json">{
+  "task_id": "task_001",
+  "goal": "Find 5 UAE hardware wholesalers for measuring tape outreach",
+  "status": "running",
+  "current_phase": "candidate_search",
+  "constraints": {
+    "target_country": "UAE",
+    "customer_types": ["wholesaler", "distributor"],
+    "excluded_types": ["retailer", "marketplace", "competitor"]
+  },
+  "artifacts": {
+    "candidate_leads": [],
+    "approved_leads": [],
+    "email_drafts": []
+  },
+  "visited_urls": [],
+  "tool_call_count": 0,
+  "created_at": "...",
+  "updated_at": "..."
+}
+</code></pre>
+<p>这样的状态比聊天历史更适合长期任务。</p>
+<p>例如，Agent 搜索到一个 URL 后，可以加入 <code>visited_urls</code>，避免重复访问。找到候选客户后，可以写入 <code>candidate_leads</code>，后续评分节点再读取。生成邮件草稿后，可以放入 <code>email_drafts</code>，等待审批。</p>
+<p>状态设计的关键是：把“任务推进所需的信息”从 prompt 中抽出来，变成系统可管理的数据。</p>
+<p>这并不意味着 prompt 不重要。模型每次决策仍然需要上下文。但上下文应该由状态动态组装，而不是把所有历史原封不动塞进去。</p>
+<p>这就是后续“上下文工程”章节要重点讨论的内容。</p>
+<hr />
+<h2 id="49-停止条件的工程设计"><a class="header" href="#49-停止条件的工程设计">4.9 停止条件的工程设计</a></h2>
+<p>停止条件不是简单的 <code>max_steps</code>。真实 Agent 至少需要多层停止机制。</p>
+<h3 id="491-目标完成停止"><a class="header" href="#491-目标完成停止">4.9.1 目标完成停止</a></h3>
+<p>目标完成停止要求 Agent 明确判断任务已经达成。</p>
+<p>例如用户要求“找 5 家客户”，那么找到 5 家符合条件客户并输出结构化结果后，可以停止。</p>
+<p>但这里有一个问题：什么叫“符合条件”？如果没有定义，模型可能把低质量客户也算进去。</p>
+<p>所以目标完成条件最好结构化。</p>
+<p>例如：</p>
+<pre><code class="language-json">{
+  "required_leads": 5,
+  "minimum_score": 70,
+  "required_fields": ["company_name", "website", "country", "business_type", "reason"]
+}
+</code></pre>
+<p>这样系统可以辅助判断，而不是完全依赖模型主观判断。</p>
+<h3 id="492-步数停止"><a class="header" href="#492-步数停止">4.9.2 步数停止</a></h3>
+<p>步数停止是最基础保护。</p>
+<p>例如：</p>
+<pre><code class="language-python">max_steps = 20
+</code></pre>
+<p>步数不是越大越好。步数太小，复杂任务无法完成；步数太大，可能浪费成本并增加风险。</p>
+<p>一个合理做法是按任务类型配置：</p>
+<pre><code class="language-text">简单问答：1–2 步
+信息查询：3–5 步
+研究任务：10–30 步
+长任务：拆成多个子任务，每个子任务有限步数
+</code></pre>
+<h3 id="493-成本停止"><a class="header" href="#493-成本停止">4.9.3 成本停止</a></h3>
+<p>模型调用和搜索工具都有成本。生产系统必须设置预算。</p>
+<p>例如：</p>
+<pre><code class="language-json">{
+  "max_model_calls": 30,
+  "max_search_calls": 20,
+  "max_tokens": 50000,
+  "max_cost_usd": 2.0
+}
+</code></pre>
+<p>如果达到预算，Agent 应该停止并汇报当前结果，而不是继续执行。</p>
+<h3 id="494-时间停止"><a class="header" href="#494-时间停止">4.9.4 时间停止</a></h3>
+<p>长任务不能无限占用资源。</p>
+<p>例如：</p>
+<pre><code class="language-text">单次同步任务最长 2 分钟。
+后台研究任务最长 30 分钟。
+定时任务超过 10 分钟自动暂停并记录原因。
+</code></pre>
+<h3 id="495-连续失败停止"><a class="header" href="#495-连续失败停止">4.9.5 连续失败停止</a></h3>
+<p>如果工具连续失败，继续执行意义不大。</p>
+<p>例如：</p>
+<pre><code class="language-python">if consecutive_tool_errors &gt;= 3:
+    state.mark_failed("Too many consecutive tool errors")
+</code></pre>
+<h3 id="496-等待人工停止"><a class="header" href="#496-等待人工停止">4.9.6 等待人工停止</a></h3>
+<p>当 Agent 遇到高风险操作或信息不足时，应该进入 waiting 状态。</p>
+<p>例如：</p>
+<pre><code class="language-json">{
+  "status": "waiting_for_user",
+  "reason": "Need approval before sending outreach emails",
+  "pending_items": ["draft_001", "draft_002"]
+}
+</code></pre>
+<p>这种停止不是失败，而是人机协同的一部分。</p>
+<hr />
+<h2 id="410-循环失控agent-最常见的问题之一"><a class="header" href="#410-循环失控agent-最常见的问题之一">4.10 循环失控：Agent 最常见的问题之一</a></h2>
+<p>Agent Loop 最大的风险之一是循环失控。</p>
+<p>循环失控不一定表现为真正的无限循环，也可能表现为低效重复、目标漂移、工具滥用、反复修复失败、不断扩大任务范围。</p>
+<h3 id="4101-重复搜索"><a class="header" href="#4101-重复搜索">4.10.1 重复搜索</a></h3>
+<p>外贸 Agent 可能连续搜索：</p>
+<pre><code class="language-text">UAE hardware wholesaler
+UAE hardware distributors
+hardware distributor UAE
+UAE tools distributor
+</code></pre>
+<p>这些关键词高度相似，如果没有去重和策略更新，Agent 会浪费调用。</p>
+<p>解决方式包括：记录已搜索 query，计算相似度，要求新 query 必须引入新维度，例如城市、客户类型、行业目录。</p>
+<h3 id="4102-重复访问"><a class="header" href="#4102-重复访问">4.10.2 重复访问</a></h3>
+<p>Agent 可能反复打开同一个网站，尤其当搜索结果重复时。</p>
+<p>解决方式是维护 <code>visited_urls</code>，访问前检查。</p>
+<h3 id="4103-目标漂移"><a class="header" href="#4103-目标漂移">4.10.3 目标漂移</a></h3>
+<p>用户要求找钢卷尺客户，Agent 搜着搜着开始研究整个五金市场趋势，最后生成宏观报告，却没有客户名单。</p>
+<p>解决方式是每轮决策前注入任务目标和当前交付物要求，并在状态中维护 <code>success_criteria</code>。</p>
+<h3 id="4104-过度反思"><a class="header" href="#4104-过度反思">4.10.4 过度反思</a></h3>
+<p>有些 Agent 会不断自我评价，却不执行有效动作。例如：</p>
+<pre><code class="language-text">我需要更好地搜索。
+我应该优化策略。
+我需要更深入分析。
+</code></pre>
+<p>但没有具体行动。</p>
+<p>解决方式是要求 reflection 必须输出可执行策略更新，且不能连续多轮只反思不行动。</p>
+<h3 id="4105-修复震荡"><a class="header" href="#4105-修复震荡">4.10.5 修复震荡</a></h3>
+<p>代码 Agent 修测试失败时，可能改 A 导致 B 失败，再改 B 导致 A 失败，反复震荡。</p>
+<p>解决方式包括 checkpoint、diff 限制、失败分类、回滚、人工介入。</p>
+<p>循环失控的根本原因，是 Agent Loop 只有“继续”的惯性，没有足够强的“停止、收敛、纠偏”机制。</p>
+<hr />
+<h2 id="411-agent-loop-的日志与可观测性"><a class="header" href="#411-agent-loop-的日志与可观测性">4.11 Agent Loop 的日志与可观测性</a></h2>
+<p>没有日志的 Agent Loop 几乎不可调试。</p>
+<p>传统程序出错时，我们可以看异常栈、输入参数、数据库记录。Agent 出错时，如果没有记录，就很难知道它为什么做出某个决策。</p>
+<p>至少应该记录：</p>
+<pre><code class="language-text">task_id
+step_id
+timestamp
+current_phase
+model_input_summary
+model_output
+action_type
+tool_name
+tool_arguments
+tool_result_summary
+status_after_step
+cost
+tokens
+latency
+error
+</code></pre>
+<p>例如一条日志：</p>
+<pre><code class="language-json">{
+  "task_id": "task_001",
+  "step_id": 3,
+  "phase": "candidate_search",
+  "action_type": "tool_call",
+  "tool_name": "search_web",
+  "tool_arguments": {
+    "query": "Dubai hand tools wholesale distributor"
+  },
+  "tool_result_summary": "10 results returned, 4 likely distributors",
+  "latency_ms": 1300,
+  "status_after_step": "running"
+}
+</code></pre>
+<p>日志有几个用途。</p>
+<p>第一，调试。你可以知道 Agent 为什么找不到客户，是搜索词不对，还是筛选规则太严格。</p>
+<p>第二，评估。你可以统计工具调用成功率、平均步数、任务完成率。</p>
+<p>第三，审计。高风险任务必须能回放执行过程。</p>
+<p>第四，产品展示。用户可以看到 Agent 正在做什么，而不是面对一个黑箱。</p>
+<p>在真实产品中，日志不只是开发者工具，也是用户信任机制。</p>
+<p>例如，外贸 Agent 输出一个客户名单时，用户会问：你为什么认为这家公司适合我？如果系统能展示来源网页、提取信号、评分理由，用户更容易信任。如果只给一个公司名和邮箱，用户很难判断。</p>
+<hr />
+<h2 id="412-agent-loop-与人机协同"><a class="header" href="#412-agent-loop-与人机协同">4.12 Agent Loop 与人机协同</a></h2>
+<p>Agent Loop 不应该只在“自动执行”和“最终回答”之间切换。它还需要第三种状态：等待人类。</p>
+<p>很多真实任务都需要人类参与。</p>
+<p>例如，外贸 Agent 找到客户后，需要用户确认是否生成开发信；生成开发信后，需要用户审核是否发送；客户回复价格太高时，需要业务员决定是否让价。</p>
+<p>代码 Agent 修改计划生成后，需要开发者确认；修改完成后，需要开发者 review diff；测试失败超过一定次数，需要开发者介入。</p>
+<p>教育 Agent 发现学生连续失败时，需要老师判断是否进行人工辅导。</p>
+<p>因此，Agent Loop 中应该有 <code>need_approval</code> 或 <code>waiting_for_user</code> 动作。</p>
+<p>例如：</p>
+<pre><code class="language-json">{
+  "type": "need_approval",
+  "approval_type": "send_email",
+  "question": "是否向以下 5 家客户发送开发信？",
+  "items": ["draft_001", "draft_002", "draft_003"]
+}
+</code></pre>
+<p>Runner 收到这个动作后，不应该继续自动执行，而应该把任务状态设为等待：</p>
+<pre><code class="language-python">if action["type"] == "need_approval":
+    state.status = "waiting_for_user"
+    state.stop_reason = "approval_required"
+    state.pending_approval = action
+    return state
+</code></pre>
+<p>这说明人机协同不是 Agent 外围功能，而是 Agent Loop 的一部分。</p>
+<p>一个安全 Agent 系统必须把“等待人类”作为合法状态，而不是异常。</p>
+<hr />
+<h2 id="413-从最小-loop-到工程-runtime"><a class="header" href="#413-从最小-loop-到工程-runtime">4.13 从最小 Loop 到工程 Runtime</a></h2>
+<p>本章实现的是最小 Loop。真实 Agent Runtime 会复杂得多。</p>
+<p>一个工程化 Agent Runtime 至少需要：</p>
+<pre><code class="language-text">任务创建：接收用户目标，生成 task_id。
+状态管理：保存任务状态、阶段、产物、历史。
+模型决策：构造上下文，调用模型，解析结构化输出。
+工具执行：校验工具、执行工具、处理超时和错误。
+审批系统：处理高风险动作和人工确认。
+调度系统：支持后台任务、定时任务、恢复任务。
+记忆系统：读取和写入长期记忆。
+日志系统：记录每一步 trace。
+评估系统：判断任务质量。
+用户界面：展示进度、结果、审批和历史。
+</code></pre>
+<p>可以看到，Agent Loop 是 Runtime 的核心，但不是全部。</p>
+<p>如果把 Agent Loop 比作发动机，那么工具系统、状态系统、记忆系统、审批系统、日志系统和 UI 就是整辆车的底盘、方向盘、刹车、仪表盘和安全带。</p>
+<p>只造一个发动机，不能上路。</p>
+<p>这也是为什么我们要系统学习 Agent，而不是只写一个循环。</p>
+<hr />
+<h2 id="414-本章小结前的综合例子"><a class="header" href="#414-本章小结前的综合例子">4.14 本章小结前的综合例子</a></h2>
+<p>最后，我们用一个完整例子串一下本章概念。</p>
+<p>用户输入：</p>
+<pre><code class="language-text">帮我找 3 家迪拜的五金工具批发商，适合推广钢卷尺，不要零售店。输出公司名称、网站、匹配理由。
+</code></pre>
+<p>Agent Loop 可以这样运行：</p>
+<pre><code class="language-text">Step 1 Observe:
+收到用户目标，约束是 Dubai、五金工具批发商、钢卷尺、排除零售店。
+
+Step 1 Think:
+需要先搜索候选客户。
+
+Step 1 Act:
+search_web("Dubai hardware tools wholesale distributor measuring tools")
+
+Step 1 Observation:
+返回 10 个搜索结果，其中包含批发商、零售电商和装修服务公司。
+
+Step 2 Think:
+需要筛选批发商，排除零售和服务类公司。
+
+Step 2 Act:
+open_url("https://candidate-1.com/about")
+
+Step 2 Observation:
+网页显示该公司供应 hand tools, measuring tools, building materials，服务 B2B 客户。
+
+Step 3 Think:
+该客户匹配度高，记录为候选。
+
+Step 3 Act:
+save_candidate_lead(...)
+
+Step 4 Observe:
+已有 1 家合格客户，目标是 3 家。
+
+Step 4 Think:
+继续处理下一个搜索结果。
+
+...
+
+Step 9 Observe:
+已有 3 家合格客户，字段完整。
+
+Step 9 Stop:
+生成最终表格，任务完成。
+</code></pre>
+<p>如果执行中只找到 2 家，Agent 可以停止并说明原因：</p>
+<pre><code class="language-text">在当前搜索范围内找到 2 家高匹配客户。第 3 家候选不足，建议扩大到 Sharjah 或使用 building materials distributor 关键词继续搜索。
+</code></pre>
+<p>这个结果比编造第 3 家更可靠。</p>
+<p>一个好的 Agent Loop，不是保证永远完成目标，而是保证在执行过程中持续观察、合理行动、遇到边界时诚实停止。</p>
+<hr />
+<h2 id="练习题"><a class="header" href="#练习题">练习题</a></h2>
+<h3 id="练习-1画出一个-agent-loop"><a class="header" href="#练习-1画出一个-agent-loop">练习 1：画出一个 Agent Loop</a></h3>
+<p>选择一个你熟悉的任务，例如“拼多多选品分析”“外贸客户开发”“代码 bug 修复”“学生错题复习”。</p>
+<p>请画出它的 Agent Loop，至少包含：</p>
+<ol>
+<li>Observe：Agent 需要观察什么信息？</li>
+<li>Think：Agent 需要判断什么？</li>
+<li>Plan：是否需要多步计划？</li>
+<li>Act：需要调用哪些工具？</li>
+<li>Reflect：什么情况下需要调整策略？</li>
+<li>Stop：什么时候停止？</li>
+</ol>
+<p>重点不是画得漂亮，而是把任务推进过程拆清楚。</p>
+<h3 id="练习-2为外贸-agent-设计停止条件"><a class="header" href="#练习-2为外贸-agent-设计停止条件">练习 2：为外贸 Agent 设计停止条件</a></h3>
+<p>假设你要做一个外贸客户开发 Agent，任务是“每天寻找 10 个适合钢卷尺的潜在客户”。</p>
+<p>请设计至少 6 类停止条件，包括：</p>
+<ol>
+<li>目标完成；</li>
+<li>搜索次数上限；</li>
+<li>时间上限；</li>
+<li>连续失败；</li>
+<li>低质量结果；</li>
+<li>等待人工审批。</li>
+</ol>
+<p>并说明每个停止条件触发后，系统应该如何向用户汇报。</p>
+<h3 id="练习-3识别循环失控"><a class="header" href="#练习-3识别循环失控">练习 3：识别循环失控</a></h3>
+<p>下面是一个 Agent 的执行日志：</p>
+<pre><code class="language-text">Step 1: search "UAE hardware wholesaler"
+Step 2: search "hardware wholesaler UAE"
+Step 3: search "UAE tools wholesaler"
+Step 4: search "tools wholesale UAE"
+Step 5: search "Dubai hardware wholesaler"
+Step 6: search "hardware wholesaler Dubai"
+</code></pre>
+<p>请分析：</p>
+<ol>
+<li>这个 Agent 出现了什么问题？</li>
+<li>你会增加哪些状态记录？</li>
+<li>你会如何要求 Agent 更新搜索策略？</li>
+<li>是否应该触发停止或人工介入？</li>
+</ol>
+<h3 id="练习-4实现一个最小-agent-loop"><a class="header" href="#练习-4实现一个最小-agent-loop">练习 4：实现一个最小 Agent Loop</a></h3>
+<p>请用 Python 实现一个最小 Agent Loop，要求：</p>
+<ol>
+<li>支持一个模拟搜索工具；</li>
+<li>支持最大步数；</li>
+<li>每一步记录 action 和 observation；</li>
+<li>支持 final_answer；</li>
+<li>达到最大步数后标记失败。</li>
+</ol>
+<p>不要求接入真实模型，可以先用规则模拟 Agent 决策。</p>
+<h3 id="练习-5加入人工确认状态"><a class="header" href="#练习-5加入人工确认状态">练习 5：加入人工确认状态</a></h3>
+<p>在练习 4 的基础上，增加一种动作类型：<code>need_approval</code>。</p>
+<p>当 Agent 准备执行高风险操作时，例如“发送邮件”或“删除文件”，Runner 不应该继续执行，而应该把任务状态设置为 <code>waiting_for_user</code>。</p>
+<p>请思考：等待用户确认时，任务状态中需要保存哪些信息？</p>
+<hr />
+<h2 id="检查清单"><a class="header" href="#检查清单">检查清单</a></h2>
+<p>读完本章后，你应该能够确认自己理解以下问题：</p>
+<pre><code class="language-text">[ ] 我理解为什么 Agent 需要循环，而不是单次模型调用。
+[ ] 我能解释 Observe、Think、Plan、Act、Reflect、Stop 的作用。
+[ ] 我知道 ReAct 的优点和局限。
+[ ] 我知道 Plan-and-Execute 适合什么任务。
+[ ] 我理解真实产品中常见的是 Workflow + Agent。
+[ ] 我能实现一个最小 Agent Loop。
+[ ] 我知道为什么必须设置最大步数和停止条件。
+[ ] 我能识别重复搜索、目标漂移、修复震荡等循环失控问题。
+[ ] 我理解任务状态不能只存在于 prompt 中。
+[ ] 我知道人工确认应该是 Agent Loop 的合法状态。
+</code></pre>
+<p>如果你只能写出一个 <code>while True</code>，但说不清什么时候停止、状态存在哪里、工具调用如何记录、失败如何恢复，那么你还没有真正掌握 Agent Loop。</p>
+<hr />
+<h2 id="本章总结"><a class="header" href="#本章总结">本章总结</a></h2>
+<p>Agent Loop 是 Agent 系统的核心执行机制。它让模型不再只是一次性回答问题，而是能够围绕目标持续观察、判断、行动和修正。</p>
+<p>本章从现实任务出发，解释了为什么外贸客户开发、代码 bug 修复、教育辅导等任务都需要基于反馈的循环执行。随后，我们拆解了 Agent Loop 的六个基本环节：Observe、Think、Plan、Act、Reflect、Stop。Observe 负责获取当前状态，Think 负责解释信息，Plan 负责制定路线，Act 负责调用工具，Reflect 负责修正策略，Stop 负责判断是否结束。</p>
+<p>我们还比较了 ReAct、Plan-and-Execute 和 Workflow + Agent 三种模式。ReAct 灵活直观，适合开放探索；Plan-and-Execute 更适合长任务和阶段性执行；Workflow + Agent 则是更接近真实产品的方式，用工作流控制大方向，用 Agent 处理不确定节点。</p>
+<p>在实现部分，我们用 Python 写了一个最小 Agent Loop，展示了任务状态、工具注册、动作执行、观察记录和停止条件。虽然这个例子很简单，但它包含了 Agent Runtime 的基本骨架。</p>
+<p>更重要的是，本章强调了 Agent Loop 的工程风险：循环失控、重复搜索、目标漂移、工具滥用、修复震荡和缺少日志。一个好的 Agent Loop 不只是会继续执行，更要知道如何停止、如何记录、如何等待人工、如何在失败时诚实汇报。</p>
+<p>从下一章开始，我们将进入 Agent 的另一个核心模块：工具系统。Agent Loop 决定 Agent 如何行动，而工具系统决定 Agent 能做什么、怎么做、做到什么边界。没有工具，Agent 只能停留在语言层面；没有安全可控的工具系统，Agent 又会变成危险的自动化黑箱。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="chapter-03-when-to-use-agent.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="chapter-05-tool-system.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="chapter-03-when-to-use-agent.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="chapter-05-tool-system.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
